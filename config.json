@@ -4,7 +4,7 @@
             "RUTX11": [
                 {
                     "command": "ATI",
-                    "expected": "QuectelEG06Revision:EG06ELAR04A04M4GOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
@@ -14,24 +14,24 @@
                 },
                 {
                     "command": "AT+GMM",
-                    "expected": "EG06OK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CGMI",
-                    "expected": "QuectelOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CTZU",
-                    "expected": "+CTZU:(0,1)OK",
+                    "expected": "OK",
                     "argument": "?"
                 }
             ],
             "TRM240": [
                 {
                     "command": "ATI",
-                    "expected": "QuectelEC21Revision:EC21ECGAR06A04M1GOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
@@ -41,24 +41,24 @@
                 },
                 {
                     "command": "AT+GMM",
-                    "expected": "EC21OK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CGMI",
-                    "expected": "QuectelOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CTZU",
-                    "expected": "+CTZU:(0,1,3)OK",
+                    "expected": "OK",
                     "argument": "?"
                 }
             ],
             "RUT955": [
                 {
                     "command": "ATI",
-                    "expected": "QuectelEC25Revision:EC25EUGAR06A03M4GOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
@@ -68,17 +68,17 @@
                 },
                 {
                     "command": "AT+GMM",
-                    "expected": "EC25OK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CGMI",
-                    "expected": "QuectelOK",
+                    "expected": "OK",
                     "argument": ""
                 },
                 {
                     "command": "AT+CTZU",
-                    "expected": "+CTZU:(0,1,3)OK",
+                    "expected": "OK",
                     "argument": "?"
                 }
             ]

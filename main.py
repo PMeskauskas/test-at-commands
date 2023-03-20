@@ -1,3 +1,6 @@
+import curses
+
+import time
 
 
 def check_connection_type(device):
@@ -18,7 +21,7 @@ def check_connection_type(device):
 
 def main():
     argparse = __import__('argparse')
-    parser = argparse.ArgumentParser(description="Automatically test AT commands",
+    parser = argparse.ArgumentParser(description="Program to automatically test AT commands",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-d" "--device-name", required=True, action="store",
                         help="Device name (for example: RUTX11, TRM240)")
@@ -36,5 +39,5 @@ def main():
     check_connection_type(vars(args))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

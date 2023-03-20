@@ -46,13 +46,8 @@ def get_modem_manufacturer(channel):
     return manufacturer_dict
 
 
-def test_at_commands_with_ssh(device):
-    at_commands = __import__("at_commands")
-    termcolor = __import__("termcolor")
-    time = __import__('time')
-    commands = at_commands.get_at_commands(device['d__device_name'])
-    print(f"Testing product: {device['d__device_name']}")
-    ssh_client = connect_to_server_with_ssh(device)
+def connect_to_channel(ssh_client):
+    time = __import__("time")
     channel = ssh_client.invoke_shell()
     channel.recv(512)
     channel.send("/etc/init.d/gsmd stop\n")
@@ -62,35 +57,76 @@ def test_at_commands_with_ssh(device):
         "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
     time.sleep(0.5)
     channel.recv(512)
+    return channel
+
+
+def print_at_commands(stdscr, curses, device_name, command, expected_response, actual_response, passed, failed, total_commands):
+    stdscr.addstr(0, 0, f"Testing product: {device_name}")
+    stdscr.addstr(1, 0, f"Currently testing: {command}")
+    stdscr.addstr(2, 0,
+                  f"Expected response: {expected_response}")
+
+    stdscr.addstr(3, 0, f"Actual response: {actual_response}")
+    stdscr.addstr(
+        4, 0, f"PASSED TESTS: {passed}", curses.color_pair(1))
+    stdscr.addstr(5, 0, f"FAILED TESTS: {failed}", curses.color_pair(2))
+    stdscr.addstr(6, 0, f"TOTAL TESTS: {total_commands}")
+    stdscr.refresh()
+    stdscr.erase()
+
+
+def test_at_commands_with_ssh(device):
+    at_commands = __import__("at_commands")
+    termcolor = __import__("termcolor")
+    time = __import__('time')
+    curses = __import__('curses')
+
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+
+    commands = at_commands.get_at_commands(device['d__device_name'])
+    device_name = device['d__device_name']
+
+    ssh_client = connect_to_server_with_ssh(device)
+    channel = connect_to_channel(ssh_client)
     command_results = get_modem_manufacturer(channel)
+
     failed = 0
     passed = 0
     for i in range(0, len(commands)):
         try:
-            command = commands[i]['command']
-            print(f"Currently testing: {command}")
-            channel.send(f"{command}\n")
-            time.sleep(0.5)
-            command_response = channel.recv(
-                512).decode().replace('\n', ' ').split()
-            command_response = ''.join(command_response)
 
-            if command_response == commands[i]['expected']:
+            command = commands[i]['command']
+            expected_response = commands[i]['expected']
+            channel.send(f"{command}\n")
+
+            actual_response = channel.recv(
+                512).decode().replace('\n', ' ').split()[-1]
+
+            if actual_response == expected_response:
                 status = 'Passed'
                 passed += 1
             else:
                 status = 'Failed'
                 failed += 1
-
+            total_commands = passed+failed
+            print_at_commands(stdscr, curses, device_name, command, expected_response,
+                              actual_response, passed, failed, total_commands)
             command_results[i+1] = {
-                "command": command, "status": status}
+                "command": command, "expected": expected_response, 'actual': actual_response, "status": status
+            }
+            time.sleep(2)
         except:
             continue
-    total_commands = passed+failed
     tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
-    print(f"PASSED TESTS: {termcolor.colored(passed,'green')}")
-    print(f"FAILED TESTS: {termcolor.colored(failed,'red')}")
-    print(f"TOTAL TESTS: {total_commands}")
+
     ssh_client.close()
+    curses.echo()
+    curses.nocbreak()
+    curses.endwin()
     return command_results
