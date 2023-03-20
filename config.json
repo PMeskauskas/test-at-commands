@@ -1,0 +1,66 @@
+{
+    "device": [
+        {
+            "RUTX11": [
+                {
+                    "command": "ATI"
+                },
+                {
+                    "command": "AT+GM"
+                },
+                {
+                    "command": "AT+GMM"
+                },
+                {
+                    "command": "AT+CGMI"
+                },
+                {
+                    "command": "AT+CGMM"
+                },
+                {
+                    "command": "AT+CGMR"
+                }
+            ],
+            "TRM240": [
+                {
+                    "command": "ATI"
+                },
+                {
+                    "command": "AT+GM"
+                },
+                {
+                    "command": "AT+GMM"
+                },
+                {
+                    "command": "AT+CGMI"
+                },
+                {
+                    "command": "AT+CGMM"
+                },
+                {
+                    "command": "AT+CGMR"
+                }
+            ],
+            "RUT955": [
+                {
+                    "command": "ATI"
+                },
+                {
+                    "command": "AT+GM"
+                },
+                {
+                    "command": "AT+GMM"
+                },
+                {
+                    "command": "AT+CGMI"
+                },
+                {
+                    "command": "AT+CGMM"
+                },
+                {
+                    "command": "AT+CGMR"
+                }
+            ]
+        }
+    ]
+}
