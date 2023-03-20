@@ -1,0 +1,13 @@
+Manufacturer,Model
+Quectel,EC25
+
+Number,Test,Status
+1,ATI,Passed
+2,AT+GM,Passed
+3,AT+GMM,Passed
+4,AT+CGMI,Passed
+5,AT+CTZU=?,Passed
+
+Passed tests,5
+Failed tests,0
+Total tests,5

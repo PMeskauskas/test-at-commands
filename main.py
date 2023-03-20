@@ -1,4 +1,3 @@
-import logging
 
 
 def check_connection_type(device):
@@ -14,10 +13,7 @@ def check_connection_type(device):
                 device)
             results.form_csv(device, command_results)
         case _:
-            logging.error("Connection type must be 'serial' or 'ssh'")
-
-
-# return OK in case of success, ERROR in case of failure
+            print("Connection type must be 'serial' or 'ssh'")
 
 
 def main():

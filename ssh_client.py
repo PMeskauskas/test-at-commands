@@ -1,5 +1,3 @@
-import logging
-import time
 
 
 def connect_to_server_with_ssh(device):
@@ -11,22 +9,23 @@ def connect_to_server_with_ssh(device):
                            username=device['username'],
                            password=device['password'],
                            timeout=10)
-        logging.info(
-            f"Successfully connected with ssh to {device['ip_address']}")
+        # print(
+        #    f"Successfully connected with ssh to {device['ip_address']}")
         return ssh_client
     except paramiko.AuthenticationException:
-        logging.error(f"Invalid authentication for: {device['ip_address']}")
+        print(f"Invalid authentication for: {device['ip_address']}")
         exit(1)
     except TimeoutError:
-        logging.error(
+        print(
             f"Was not able to connect with SSH, IP: {device['ip_address']}")
         exit(1)
     except paramiko.SSHException:
-        logging.error(f"No existing session: {device['ip_address']}")
+        print(f"No existing session: {device['ip_address']}")
         exit(1)
 
 
 def get_modem_manufacturer(channel):
+    time = __import__('time')
     manufacturer_dict = dict()
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
     results = list()
@@ -49,6 +48,8 @@ def get_modem_manufacturer(channel):
 
 def test_at_commands_with_ssh(device):
     at_commands = __import__("at_commands")
+    termcolor = __import__("termcolor")
+    time = __import__('time')
     commands = at_commands.get_at_commands(device['d__device_name'])
     print(f"Testing product: {device['d__device_name']}")
     ssh_client = connect_to_server_with_ssh(device)
@@ -67,24 +68,29 @@ def test_at_commands_with_ssh(device):
     for i in range(0, len(commands)):
         try:
             command = commands[i]['command']
-
+            print(f"Currently testing: {command}")
             channel.send(f"{command}\n")
             time.sleep(0.5)
-            command_response = channel.recv(512).decode().rstrip()
-            # temporary check
-            if "OK" in command_response:
+            command_response = channel.recv(
+                512).decode().replace('\n', ' ').split()
+            command_response = ''.join(command_response)
+
+            if command_response == commands[i]['expected']:
                 status = 'Passed'
                 passed += 1
             else:
                 status = 'Failed'
                 failed += 1
-            print(f"Currently testing: {command}")
+
             command_results[i+1] = {
                 "command": command, "status": status}
         except:
             continue
-    tests_dict = {"passed": passed, "failed": failed, 'total': passed+failed}
+    total_commands = passed+failed
+    tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
-    print(command_results)
+    print(f"PASSED TESTS: {termcolor.colored(passed,'green')}")
+    print(f"FAILED TESTS: {termcolor.colored(failed,'red')}")
+    print(f"TOTAL TESTS: {total_commands}")
     ssh_client.close()
     return command_results
