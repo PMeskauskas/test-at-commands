@@ -37,25 +37,28 @@ options:
 
 ![image](https://user-images.githubusercontent.com/88384951/226345001-3c977585-76fc-4ef1-9894-f943ba515317.png)
 
-4. Run the following command:
+3. Run the following command:
 ```
 python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 ```
-5. You should be able to see what model is currently being tested and commands that are currently being tested. After the test it should show how many commands passed, how many commands failed and the total number of commands tested.
+4. When testing you should be able to see what model is currently being tested, what commands that are currently being tested, expected and actual output. After the test it should show how many commands passed, how many commands failed and the total number of commands tested.
 ```
 $ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 Testing product: RUTX11
-Currently testing: ATI
-Currently testing: AT+CGMI
-Currently testing: AT+CTZU=?
-PASSED TESTS: 3
+Currently testing: AT+GM
+Expected response: ERROR
+Actual response: ERROR
+PASSED TESTS: 2
 FAILED TESTS: 0
-TOTAL TESTS: 3
+TOTAL TESTS: 2
 ```
 
-7. After the test, the program should create a .csv file **MODEL_NAME_DATE.csv** with information: 
+5. After the test, the program should create a .csv file **ModelName_Date.csv** with information: 
+* the manufacturer and model of the modem;
+* testing command number, test name, expected test output, actual test output and the status of the test;
+* how many tests were passed;
+* how many tests were failed;
+* the total amount of tests.
 
-* about what command was tested;
-* what result was expected;
-* what was the result of the tested command and whether the command passed the test;
-* the manufacturer and model of the modem.
+![image](https://user-images.githubusercontent.com/88384951/226536551-0be88176-9538-4b7b-8dbf-23128a4b7b00.png)
+
