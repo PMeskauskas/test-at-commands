@@ -30,19 +30,23 @@ def get_modem_manufacturer_ssh(channel):
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
     results = list()
     while (len(results) != len(manufacturer_commands)):
-        for i in range(0, len(manufacturer_commands)):
-            channel.send(f"{manufacturer_commands[i]}\n")
-            time.sleep(0.5)
-            command_response = channel.recv(
-                512).decode().replace('\n', ' ').split()[0]
-            if command_response == '':
-                continue
-            if command_response not in results:
-                results.insert(i, command_response)
-    manufacturer_dict['manufacturer'] = {
-        "manufacturer": results[0],
-        'model': results[1],
-    }
+        try:
+            for i in range(0, len(manufacturer_commands)):
+                channel.send(f"{manufacturer_commands[i]}\n")
+                time.sleep(0.5)
+                command_response = channel.recv(
+                    512).decode().replace('\n', ' ').split()[1]
+                print(command_response)
+                if command_response == '':
+                    continue
+                if command_response not in results:
+                    results.insert(i, command_response)
+            manufacturer_dict['manufacturer'] = {
+                "manufacturer": results[0],
+                'model': results[1],
+            }
+        except:
+            continue
     return manufacturer_dict
 
 
@@ -77,11 +81,20 @@ def test_at_commands_with_ssh(device):
         try:
             command = commands[i]['command']
             expected_response = commands[i]['expected']
+
             channel.send(f"{command}\n")
             time.sleep(0.5)
+
+            if 'extras' in commands[i]:
+                extras = commands[i]['extras']
+                for j in range(0, len(extras)):
+                    if extras[j]['command'].isnumeric():
+                        channel.send(f"{chr(int(extras[j]['command']))}\n")
+                    else:
+                        channel.send(f"{extras[j]['command']}\n")
+                    time.sleep(0.5)
             actual_response = channel.recv(
                 512).decode().replace('\n', ' ').split()[-1]
-
             if actual_response == expected_response:
                 status = 'Passed'
                 passed += 1
@@ -100,5 +113,6 @@ def test_at_commands_with_ssh(device):
     tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
     ssh_client.close()
+    channel.close()
     at_commands.del_curses(curses)
     return command_results

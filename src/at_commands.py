@@ -5,10 +5,15 @@ def get_at_commands(device_name):
         data = json.load(config_file)
         try:
             commands = data['device'][0][device_name]
+
             for i in range(0, len(commands)):
                 argument = commands[i]['argument']
+                command = commands[i]['command']
                 if argument != "":
-                    commands[i]["command"] = f"{commands[i]['command']}={argument}"
+                    if argument.isnumeric() or argument == "?":
+                        commands[i]["command"] = f"{command}={argument}"
+                    else:
+                        commands[i]["command"] = f"{command}=\"{argument}\""
             return commands
         except KeyError:
             print(

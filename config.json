@@ -3,85 +3,55 @@
         {
             "RUTX11": [
                 {
-                    "command": "ATI",
+                    "command": "ATE1",
                     "expected": "OK",
                     "argument": ""
                 },
                 {
-                    "command": "AT+GM",
-                    "expected": "ERROR",
-                    "argument": ""
+                    "command": "AT+CMGF",
+                    "expected": "OK",
+                    "argument": "1"
                 },
                 {
-                    "command": "AT+GMM",
+                    "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGMI",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CTZU",
-                    "expected": "OK",
-                    "argument": "?"
+                    "argument": "+37063841960",
+                    "extras": [
+                        {
+                            "command": "Sample text"
+                        },
+                        {
+                            "command": "26"
+                        }
+                    ]
                 }
             ],
             "TRM240": [
                 {
-                    "command": "ATI",
+                    "command": "ATE1",
                     "expected": "OK",
                     "argument": ""
                 },
                 {
-                    "command": "AT+GM",
-                    "expected": "ERROR",
-                    "argument": ""
+                    "command": "AT+CMGF",
+                    "expected": "OK",
+                    "argument": "1"
                 },
                 {
-                    "command": "AT+GMM",
+                    "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGMI",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CTZU",
-                    "expected": "OK",
-                    "argument": "?"
+                    "argument": "+37063841960",
+                    "extras": [
+                        {
+                            "command": "Sample text"
+                        },
+                        {
+                            "command": "26"
+                        }
+                    ]
                 }
             ],
-            "RUT955": [
-                {
-                    "command": "ATI",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+GM",
-                    "expected": "ERROR",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+GMM",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGMI",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CTZU",
-                    "expected": "OK",
-                    "argument": "?"
-                }
-            ]
+            "RUT955": []
         }
     ]
 }

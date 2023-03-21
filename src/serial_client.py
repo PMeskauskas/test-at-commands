@@ -32,7 +32,8 @@ def get_modem_manufacturer_serial(serial_client):
             try:
                 serial_client.write(f"{manufacturer_commands[i]}\r".encode())
                 command_response = serial_client.read(
-                    512).decode().replace('\n', ' ').split()[0]
+                    512).decode().replace('\n', ' ').split()[1]
+                print(command_response)
                 if command_response == '':
                     continue
                 if command_response not in results:
