@@ -46,12 +46,12 @@ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 ```
 $ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 Testing product: RUTX11
-Currently testing: AT+GM
-Expected response: ERROR
-Actual response: ERROR
-PASSED TESTS: 2
+Currently testing: ATE1
+Expected response: OK
+Actual response: OK
+PASSED TESTS: 1
 FAILED TESTS: 0
-TOTAL TESTS: 2
+TOTAL TESTS: 1
 ```
 
 5. After the test, the program should create a .csv file **ModelName_Date.csv** with information: 
@@ -61,5 +61,6 @@ TOTAL TESTS: 2
 * how many tests were failed;
 * the total amount of tests.
 
-![image](https://user-images.githubusercontent.com/88384951/226536551-0be88176-9538-4b7b-8dbf-23128a4b7b00.png)
+![image](https://user-images.githubusercontent.com/88384951/226628110-0e1ddb5b-41d2-409c-8673-7fdbcf79c322.png)
+
 
