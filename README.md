@@ -41,7 +41,7 @@ options:
 ```
 python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 ```
-4. When testing you should be able to see what model is currently being tested, what commands that are currently being tested, expected and actual output. After the test it should show how many commands passed, how many commands failed and the total number of commands tested.
+4. When testing you should be able to see what model is currently being tested, what commands  are currently being tested, command expected output, command actual output, how many tests currently passed or failed and the total number of tests.
 ```
 $ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 Testing product: RUTX11
