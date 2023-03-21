@@ -8,7 +8,7 @@ def connect_to_server_with_serial(device):
                                       stopbits=serial.STOPBITS_ONE,
                                       bytesize=serial.EIGHTBITS,
                                       parity=serial.PARITY_NONE,
-                                      timeout=0.3)
+                                      timeout=0.5)
         # print(
         #   f"Successfully connected with serial to {device['serial_port']}")
         return serial_client
@@ -27,23 +27,26 @@ def get_modem_manufacturer_serial(serial_client):
     manufacturer_dict = dict()
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
     results = list()
-    while (len(results) != len(manufacturer_commands)):
-        for i in range(0, len(manufacturer_commands)):
+    for i in range(0, len(manufacturer_commands)):
+        while True:
             try:
                 serial_client.write(f"{manufacturer_commands[i]}\r".encode())
+
                 command_response = serial_client.read(
                     512).decode().replace('\n', ' ').split()[1]
-                print(command_response)
+
                 if command_response == '':
                     continue
                 if command_response not in results:
                     results.insert(i, command_response)
+                    break
             except:
                 continue
     manufacturer_dict['manufacturer'] = {
         "manufacturer": results[0],
         'model': results[1],
     }
+
     return manufacturer_dict
 
 
@@ -56,21 +59,34 @@ def test_at_commands_with_serial(device):
     stdscr = at_commands.init_stdscr(curses)
     serial_client = connect_to_server_with_serial(device)
     serial_client.write(b"sudo systemctl stop ModemManager\r")
+
     time.sleep(0.5)
     command_results = get_modem_manufacturer_serial(serial_client)
     failed = 0
     passed = 0
-    while len(command_results) != len(commands)+1:
-        for i in range(0, len(commands)):
+    for i in range(0, len(commands)):
+        while i+1 not in command_results:
+
             command = commands[i]['command']
             try:
-                if i+1 in command_results:
-                    continue
                 command = commands[i]['command']
                 expected_response = commands[i]['expected']
                 serial_client.write(f"{command}\r".encode())
+
+                if 'extras' in commands[i]:
+                    extras = commands[i]['extras']
+                    for j in range(0, len(extras)):
+                        time.sleep(0.5)
+                        if extras[j]['command'].isnumeric():
+                            serial_client.write(
+                                f"{chr(int(extras[j]['command']))}\r".encode())
+
+                        else:
+                            serial_client.write(
+                                f"{extras[j]['command']}\r".encode())
+
                 actual_response = serial_client.read(
-                    512).decode().replace('\n', ' ').split()[-1]
+                    1000).decode().replace('\n', ' ').split()[-1]
 
                 if actual_response == '':
                     continue

@@ -15,7 +15,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37063841960",
+                    "argument": "+3706000000",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -40,7 +40,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37063841960",
+                    "argument": "+3706000000",
                     "extras": [
                         {
                             "command": "Sample text"
