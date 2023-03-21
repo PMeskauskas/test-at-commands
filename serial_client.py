@@ -23,7 +23,7 @@ def connect_to_server_with_serial(device):
         exit(1)
 
 
-def get_modem_manufacturer(serial_client):
+def get_modem_manufacturer_serial(serial_client):
     manufacturer_dict = dict()
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
     results = list()
@@ -48,14 +48,15 @@ def get_modem_manufacturer(serial_client):
 
 def test_at_commands_with_serial(device):
     at_commands = __import__("at_commands")
-    termcolor = __import__('termcolor')
     time = __import__('time')
+    curses = __import__('curses')
     commands = at_commands.get_at_commands(device['d__device_name'])
-    print(f"Testing product: {device['d__device_name']}")
+    device_name = device['d__device_name']
+    stdscr = at_commands.init_stdscr(curses)
     serial_client = connect_to_server_with_serial(device)
     serial_client.write(b"sudo systemctl stop ModemManager\r")
     time.sleep(0.5)
-    command_results = get_modem_manufacturer(serial_client)
+    command_results = get_modem_manufacturer_serial(serial_client)
     failed = 0
     passed = 0
     while len(command_results) != len(commands)+1:
@@ -64,34 +65,34 @@ def test_at_commands_with_serial(device):
             try:
                 if i+1 in command_results:
                     continue
-
                 command = commands[i]['command']
+                expected_response = commands[i]['expected']
                 serial_client.write(f"{command}\r".encode())
-                command_response = serial_client.read(
-                    512).decode().replace('\n', ' ').split()
-                command_response = ''.join(command_response)
+                actual_response = serial_client.read(
+                    512).decode().replace('\n', ' ').split()[-1]
 
-                if command_response == '':
+                if actual_response == '':
                     continue
 
-                if command_response == commands[i]['expected']:
+                if actual_response == commands[i]['expected']:
                     status = 'Passed'
                     passed += 1
                 else:
                     status = 'Failed'
                     failed += 1
-
-                print(f"Currently testing: {command}")
+                total_commands = passed+failed
+                at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
+                                              actual_response, passed, failed, total_commands)
                 command_results[i+1] = {
-                    "command": command, "status": status}
+                    "command": command, "expected": expected_response, 'actual': actual_response, "status": status
+                }
+                time.sleep(2)
             except:
                 continue
-    total_commands = passed+failed
+
     tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
-    print(f"PASSED TESTS: {termcolor.colored(passed,'green')}")
-    print(f"FAILED TESTS: {termcolor.colored(failed,'red')}")
-    print(f"TOTAL TESTS: {total_commands}")
     serial_client.close()
     del serial_client
+    at_commands.del_curses(curses)
     return command_results

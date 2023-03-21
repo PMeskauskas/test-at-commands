@@ -24,7 +24,7 @@ def connect_to_server_with_ssh(device):
         exit(1)
 
 
-def get_modem_manufacturer(channel):
+def get_modem_manufacturer_ssh(channel):
     time = __import__('time')
     manufacturer_dict = dict()
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
@@ -60,50 +60,25 @@ def connect_to_channel(ssh_client):
     return channel
 
 
-def print_at_commands(stdscr, curses, device_name, command, expected_response, actual_response, passed, failed, total_commands):
-    stdscr.addstr(0, 0, f"Testing product: {device_name}")
-    stdscr.addstr(1, 0, f"Currently testing: {command}")
-    stdscr.addstr(2, 0,
-                  f"Expected response: {expected_response}")
-
-    stdscr.addstr(3, 0, f"Actual response: {actual_response}")
-    stdscr.addstr(
-        4, 0, f"PASSED TESTS: {passed}", curses.color_pair(1))
-    stdscr.addstr(5, 0, f"FAILED TESTS: {failed}", curses.color_pair(2))
-    stdscr.addstr(6, 0, f"TOTAL TESTS: {total_commands}")
-    stdscr.refresh()
-    stdscr.erase()
-
-
 def test_at_commands_with_ssh(device):
     at_commands = __import__("at_commands")
-    termcolor = __import__("termcolor")
     time = __import__('time')
     curses = __import__('curses')
-
-    stdscr = curses.initscr()
-    curses.noecho()
-    curses.cbreak()
-    curses.start_color()
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-
     commands = at_commands.get_at_commands(device['d__device_name'])
     device_name = device['d__device_name']
-
+    stdscr = at_commands.init_stdscr(curses)
     ssh_client = connect_to_server_with_ssh(device)
     channel = connect_to_channel(ssh_client)
-    command_results = get_modem_manufacturer(channel)
+    command_results = get_modem_manufacturer_ssh(channel)
 
     failed = 0
     passed = 0
     for i in range(0, len(commands)):
         try:
-
             command = commands[i]['command']
             expected_response = commands[i]['expected']
             channel.send(f"{command}\n")
-
+            time.sleep(0.5)
             actual_response = channel.recv(
                 512).decode().replace('\n', ' ').split()[-1]
 
@@ -114,8 +89,8 @@ def test_at_commands_with_ssh(device):
                 status = 'Failed'
                 failed += 1
             total_commands = passed+failed
-            print_at_commands(stdscr, curses, device_name, command, expected_response,
-                              actual_response, passed, failed, total_commands)
+            at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
+                                          actual_response, passed, failed, total_commands)
             command_results[i+1] = {
                 "command": command, "expected": expected_response, 'actual': actual_response, "status": status
             }
@@ -124,9 +99,6 @@ def test_at_commands_with_ssh(device):
             continue
     tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
-
     ssh_client.close()
-    curses.echo()
-    curses.nocbreak()
-    curses.endwin()
+    at_commands.del_curses(curses)
     return command_results

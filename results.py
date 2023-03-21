@@ -17,12 +17,15 @@ def form_csv(device, command_results):
             writer.writerow(['Manufacturer', 'Model'])
             writer.writerow([manufacturer, model])
             writer.writerow('')
-            writer.writerow(['Number', 'Test', 'Status'])
+            writer.writerow(
+                ['Number', 'Test', 'Expected output', 'Actual output', 'Status'])
             for i in range(0, total_tests):
                 number = i+1
                 command = command_results[number]['command']
+                expected = command_results[number]['expected']
+                actual = command_results[number]['expected']
                 status = command_results[number]['status']
-                row = [number, command, status]
+                row = [number, command, expected, actual, status]
                 writer.writerow(row)
             writer.writerow('')
             writer.writerow(['Passed tests', passed_tests])

@@ -1,7 +1,3 @@
-import curses
-
-import time
-
 
 def check_connection_type(device):
     results = __import__("results")
