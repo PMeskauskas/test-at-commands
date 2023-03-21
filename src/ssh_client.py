@@ -35,7 +35,7 @@ def get_modem_manufacturer_ssh(channel):
                 channel.send(f"{manufacturer_commands[i]}\n")
                 time.sleep(0.5)
                 command_response = channel.recv(
-                    512).decode().replace('\n', ' ').split()[1]
+                    512).decode().replace('\n', ' ').split()[0]
                 print(command_response)
                 if command_response == '':
                     continue
@@ -95,6 +95,7 @@ def test_at_commands_with_ssh(device):
                     time.sleep(0.5)
             actual_response = channel.recv(
                 512).decode().replace('\n', ' ').split()[-1]
+            print(actual_response)
             if actual_response == expected_response:
                 status = 'Passed'
                 passed += 1
@@ -102,8 +103,8 @@ def test_at_commands_with_ssh(device):
                 status = 'Failed'
                 failed += 1
             total_commands = passed+failed
-            at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
-                                          actual_response, passed, failed, total_commands)
+            # at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
+            #                             actual_response, passed, failed, total_commands)
             command_results[i+1] = {
                 "command": command, "expected": expected_response, 'actual': actual_response, "status": status
             }

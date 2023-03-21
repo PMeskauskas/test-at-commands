@@ -3,11 +3,6 @@
         {
             "RUTX11": [
                 {
-                    "command": "ATE1",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
                     "command": "AT+CMGF",
                     "expected": "OK",
                     "argument": "1"
@@ -15,7 +10,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+3706000000",
+                    "argument": "+37063841960",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -27,11 +22,6 @@
                 }
             ],
             "TRM240": [
-                {
-                    "command": "ATE1",
-                    "expected": "OK",
-                    "argument": ""
-                },
                 {
                     "command": "AT+CMGF",
                     "expected": "OK",

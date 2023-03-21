@@ -33,8 +33,8 @@ def get_modem_manufacturer_serial(serial_client):
                 serial_client.write(f"{manufacturer_commands[i]}\r".encode())
 
                 command_response = serial_client.read(
-                    512).decode().replace('\n', ' ').split()[1]
-
+                    512).decode().replace('\n', ' ').split()[0]
+                print(command_response)
                 if command_response == '':
                     continue
                 if command_response not in results:
@@ -46,7 +46,6 @@ def get_modem_manufacturer_serial(serial_client):
         "manufacturer": results[0],
         'model': results[1],
     }
-
     return manufacturer_dict
 
 

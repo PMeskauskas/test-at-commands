@@ -23,7 +23,7 @@ def form_csv(device, command_results):
                 number = i+1
                 command = command_results[number]['command']
                 expected = command_results[number]['expected']
-                actual = command_results[number]['expected']
+                actual = command_results[number]['actual']
                 status = command_results[number]['status']
                 row = [number, command, expected, actual, status]
                 writer.writerow(row)
