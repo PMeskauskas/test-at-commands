@@ -9,7 +9,7 @@ def form_csv(device, command_results):
     total_tests = command_results['tests']['total']
     passed_tests = command_results['tests']['passed']
     failed_tests = command_results['tests']['failed']
-    with open(f"{filename}", 'a+', newline='') as file:
+    with open(f"results/{filename}", 'a+', newline='') as file:
         csv = __import__("csv")
         writer = csv.writer(file)
 

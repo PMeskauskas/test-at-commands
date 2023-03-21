@@ -36,4 +36,6 @@ def main():
 
 
 if __name__ == '__main__':
+    sys = __import__('sys')
+    sys.path.append('src')
     main()
