@@ -31,11 +31,12 @@ options:
   -P [PASSWORD], --password [PASSWORD]
                         Server password (default: Admin123)
 ```
-# Example with ssh
+# Example with ssh to send sms messages
 1. Connect your device to the ethernet cable
-2. In the configuration file **config.json** enter the device model with commands you want to test. In the data structure you need to specify what commands to run, the expected result and if there are any arguments to use (if not, then leave blank). An example of the data structure:
+2. In the configuration file **config.json** enter the device model with commands you want to test. In the data structure you need to specify what commands to run, the expected result, arguments and what extra commands to use (if arguments or extra commands not needed, then leave blank). An example of the data structure in **config.json**:
 
-![image](https://user-images.githubusercontent.com/88384951/226541253-e5ecbef1-8d3f-4d25-a2a4-17a8b051a8f5.png)
+![image](https://user-images.githubusercontent.com/88384951/226626282-28dc7688-afd7-46c3-a35d-6714b1b77cf7.png)
+
 
 3. Run the following command:
 ```
