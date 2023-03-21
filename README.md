@@ -35,7 +35,7 @@ options:
 1. Connect your device to the ethernet cable
 2. In the configuration file **config.json** enter the device model with commands you want to test. In the data structure you need to specify what commands to run, the expected result and if there are any arguments to use (if not, then leave blank). An example of the data structure:
 
-![image](https://user-images.githubusercontent.com/88384951/226345001-3c977585-76fc-4ef1-9894-f943ba515317.png)
+![image](https://user-images.githubusercontent.com/88384951/226541253-e5ecbef1-8d3f-4d25-a2a4-17a8b051a8f5.png)
 
 3. Run the following command:
 ```
