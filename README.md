@@ -1,5 +1,5 @@
 # test-at-commands
-Program for automatically testing AT commands
+Program for automatically testing AT commands with serial or ssh protocols
 
 # installation
 1. Download and extract the files to a directory
