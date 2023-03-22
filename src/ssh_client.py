@@ -1,131 +1,122 @@
+class SshClient:
+    def __init__(self, device):
+        config_data = __import__('config_data')
+        self.time = __import__('time')
+        self.device = device
+        self.commands = config_data.ConfigData(
+            self.device['d__device_name']).commands
 
+        self.ssh_client = None
+        self.channel = None
+        self.command_results = dict()
+        self.connect_to_server_with_ssh()
+        self.connect_to_channel()
+        self.get_modem_manufacturer_with_ssh()
+        self.execute_at_commands_with_ssh()
 
-def connect_to_server_with_ssh(device):
-    try:
-        paramiko = __import__('paramiko')
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=device['ip_address'],
-                           username=device['username'],
-                           password=device['password'],
-                           timeout=10)
+        self.ssh_client.close()
+        self.channel.close()
 
-        return ssh_client
-    except paramiko.AuthenticationException:
-        print(f"Invalid authentication for: {device['ip_address']}")
-        exit(1)
-    except TimeoutError:
-        print(
-            f"Was not able to connect with SSH, IP: {device['ip_address']}")
-        exit(1)
-    except paramiko.SSHException:
-        print(f"No existing session: {device['ip_address']}")
-        exit(1)
-
-
-def get_modem_manufacturer_with_ssh(channel):
-    time = __import__('time')
-    manufacturer_dict = dict()
-    manufacturer_commands = ['AT+GMI', "AT+GMM"]
-    results = list()
-    while (len(results) != len(manufacturer_commands)):
+    def connect_to_server_with_ssh(self):
         try:
-            for i in range(0, len(manufacturer_commands)):
-                channel.send(f"{manufacturer_commands[i]}\n")
-                time.sleep(0.5)
-                command_response = channel.recv(
-                    512).decode().replace('\n', ' ').split()[0]
+            paramiko = __import__('paramiko')
+            self.ssh_client = paramiko.SSHClient()
+            self.ssh_client.set_missing_host_key_policy(
+                paramiko.AutoAddPolicy())
+            self.ssh_client.connect(hostname=self.device['ip_address'],
+                                    username=self.device['username'],
+                                    password=self.device['password'],
+                                    timeout=10)
+        except paramiko.AuthenticationException:
+            print(f"Invalid authentication for: {self.device['ip_address']}")
+            exit(1)
+        except TimeoutError:
+            print(
+                f"Was not able to connect with SSH, IP: {self.device['ip_address']}")
+            exit(1)
+        except paramiko.SSHException:
+            print(f"No existing session: {self.device['ip_address']}")
+            exit(1)
 
-                if command_response == '':
-                    continue
-                if command_response not in results:
-                    results.insert(i, command_response)
-            manufacturer_dict['manufacturer'] = {
-                "manufacturer": results[0],
-                'model': results[1],
-            }
-        except:
-            continue
-    return manufacturer_dict
+    def connect_to_channel(self):
+        self.channel = self.ssh_client.invoke_shell()
+        self.channel.recv(512)
+        self.channel.send("/etc/init.d/gsmd stop\n")
+        self.channel.recv(512)
+        self.time.sleep(2)
+        self.channel.send(
+            "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
+        self.time.sleep(0.5)
+        self.channel.recv(512)
 
+    def get_modem_manufacturer_with_ssh(self):
+        manufacturer_commands = ['AT+GMI', "AT+GMM"]
+        results = list()
+        while (len(results) != len(manufacturer_commands)):
+            try:
+                for i in range(0, len(manufacturer_commands)):
+                    self.channel.send(f"{manufacturer_commands[i]}\n")
+                    self.time.sleep(0.5)
+                    command_response = self.channel.recv(
+                        512).decode().replace('\n', ' ').split()[0]
 
-def connect_to_channel(ssh_client):
-    time = __import__("time")
-    channel = ssh_client.invoke_shell()
-    channel.recv(512)
-    channel.send("/etc/init.d/gsmd stop\n")
-    channel.recv(512)
-    time.sleep(2)
-    channel.send(
-        "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
-    time.sleep(0.5)
-    channel.recv(512)
-    return channel
+                    if command_response == '':
+                        continue
+                    if command_response not in results:
+                        results.insert(i, command_response)
+                self.command_results['manufacturer'] = {
+                    "manufacturer": results[0],
+                    'model': results[1],
+                }
+            except:
+                continue
 
+    def execute_at_commands_with_ssh(self):
+        print_commands = __import__("print_commands")
 
-def execute_extra_commands_with_ssh(extra_commands, channel, time):
-    for j in range(0, len(extra_commands)):
-        if extra_commands[j]['command'].isnumeric():
-            channel.send(f"{chr(int(extra_commands[j]['command']))}\n")
-        else:
-            channel.send(f"{extra_commands[j]['command']}\n")
-        time.sleep(0.5)
+        print_object = print_commands.PrintCommands()
 
+        failed = 0
+        passed = 0
+        for i in range(0, len(self.commands)):
+            try:
+                command = self.commands[i]['command']
+                expected_response = self.commands[i]['expected']
 
-def execute_at_commands_with_ssh(commands, channel, device_name):
-    print_commands = __import__("print_commands")
-    curses = __import__('curses')
-    time = __import__('time')
-    stdscr = print_commands.init_stdscr(curses)
-    command_results = get_modem_manufacturer_with_ssh(channel)
-    failed = 0
-    passed = 0
-    for i in range(0, len(commands)):
-        try:
-            command = commands[i]['command']
-            expected_response = commands[i]['expected']
+                self.channel.send(f"{command}\n")
+                self.time.sleep(0.5)
 
-            channel.send(f"{command}\n")
-            time.sleep(0.5)
+                if 'extras' in self.commands[i]:
+                    self.execute_extra_commands_with_ssh(
+                        self.commands[i]['extras'])
 
-            if 'extras' in commands[i]:
-                execute_extra_commands_with_ssh(
-                    commands[i]['extras'], channel, time)
+                actual_response = self.channel.recv(
+                    512).decode().replace('\n', ' ').split()[-1]
+                if actual_response == expected_response:
+                    status = 'Passed'
+                    passed += 1
+                else:
+                    status = 'Failed'
+                    failed += 1
+                total_commands = passed+failed
+                print_object.print_at_commands(self.device['d__device_name'], command, expected_response,
+                                               actual_response, passed, failed, total_commands)
+                self.command_results[i+1] = {
+                    "command": command, "expected": expected_response, 'actual': actual_response, "status": status
+                }
+                self.time.sleep(2)
+            except:
+                continue
+        tests_dict = {"passed": passed,
+                      "failed": failed, 'total': total_commands}
+        self.command_results['tests'] = tests_dict
+        print_object.del_curses()
 
-            actual_response = channel.recv(
-                512).decode().replace('\n', ' ').split()[-1]
-            if actual_response == expected_response:
-                status = 'Passed'
-                passed += 1
+    def execute_extra_commands_with_ssh(self, extra_commands):
+        for j in range(0, len(extra_commands)):
+            if extra_commands[j]['command'].isnumeric():
+                self.channel.send(
+                    f"{chr(int(extra_commands[j]['command']))}\n")
             else:
-                status = 'Failed'
-                failed += 1
-            total_commands = passed+failed
-            print_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
-                                             actual_response, passed, failed, total_commands)
-            command_results[i+1] = {
-                "command": command, "expected": expected_response, 'actual': actual_response, "status": status
-            }
-            time.sleep(2)
-        except:
-            continue
-    tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
-    command_results['tests'] = tests_dict
-    print_commands.del_curses(curses)
-    return command_results
-
-
-def test_at_commands_with_ssh(device):
-    config_data = __import__("config_data")
-    device_name = device['d__device_name']
-
-    commands = config_data.get_at_commands(device_name)
-    ssh_client = connect_to_server_with_ssh(device)
-    channel = connect_to_channel(ssh_client)
-    command_results = execute_at_commands_with_ssh(
-        commands, channel, device_name)
-
-    ssh_client.close()
-    channel.close()
-
-    return command_results
+                self.channel.send(f"{extra_commands[j]['command']}\n")
+            self.time.sleep(0.5)

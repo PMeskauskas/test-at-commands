@@ -1,16 +1,20 @@
 
+
 def check_connection_type(device):
     results = __import__("results")
+
     match device['connection_type']:
         case 'ssh':
             ssh_client = __import__('ssh_client')
-            command_results = ssh_client.test_at_commands_with_ssh(device)
-            results.form_csv(device, command_results)
+            ssh_object = ssh_client.SshClient(device)
+
+            results.Results(device['d__device_name'],
+                            ssh_object.command_results)
         case 'serial':
             serial_client = __import__('serial_client')
-            command_results = serial_client.test_at_commands_with_serial(
-                device)
-            results.form_csv(device, command_results)
+            serial_object = serial_client.SerialClient(device)
+            results.Results(device['d__device_name'],
+                            serial_object.command_results)
         case _:
             print("Connection type must be 'serial' or 'ssh'")
 
