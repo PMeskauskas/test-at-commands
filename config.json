@@ -41,7 +41,23 @@
                     ]
                 }
             ],
-            "RUT955": []
+            "RUT955": [
+                {
+                    "command": "AT",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "ATI",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMI",
+                    "expected": "OK",
+                    "argument": ""
+                }
+            ]
         }
     ]
 }

@@ -9,17 +9,14 @@ def connect_to_server_with_serial(device):
                                       bytesize=serial.EIGHTBITS,
                                       parity=serial.PARITY_NONE,
                                       timeout=0.5)
-        # print(
-        #   f"Successfully connected with serial to {device['serial_port']}")
         return serial_client
     except TimeoutError:
         print(
             f"Was not able to connect with serial, PORT: {device['serial_port']}")
         exit(1)
-        pass
     except serial.serialutil.SerialException:
         print(
-            f"Could not open port with serial, PORT: {device['serial_port']}")
+            f"Could not open port with serial, PORT: {device['serial_port']} (Check permissions.)")
         exit(1)
 
 
@@ -34,7 +31,6 @@ def get_modem_manufacturer_serial(serial_client):
 
                 command_response = serial_client.read(
                     512).decode().replace('\n', ' ').split()[0]
-                print(command_response)
                 if command_response == '':
                     continue
                 if command_response not in results:
@@ -50,12 +46,13 @@ def get_modem_manufacturer_serial(serial_client):
 
 
 def test_at_commands_with_serial(device):
-    at_commands = __import__("at_commands")
+    config_data = __import__("config_data")
+    print_commands = __import__("print_commands")
     time = __import__('time')
     curses = __import__('curses')
-    commands = at_commands.get_at_commands(device['d__device_name'])
     device_name = device['d__device_name']
-    stdscr = at_commands.init_stdscr(curses)
+    commands = config_data.get_at_commands(device_name)
+    stdscr = print_commands.init_stdscr(curses)
     serial_client = connect_to_server_with_serial(device)
     serial_client.write(b"sudo systemctl stop ModemManager\r")
 
@@ -97,8 +94,8 @@ def test_at_commands_with_serial(device):
                     status = 'Failed'
                     failed += 1
                 total_commands = passed+failed
-                at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
-                                              actual_response, passed, failed, total_commands)
+                print_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
+                                                 actual_response, passed, failed, total_commands)
                 command_results[i+1] = {
                     "command": command, "expected": expected_response, 'actual': actual_response, "status": status
                 }
@@ -106,9 +103,10 @@ def test_at_commands_with_serial(device):
             except:
                 continue
 
-    tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
+    tests_dict = {"passed": passed,
+                  "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
     serial_client.close()
     del serial_client
-    at_commands.del_curses(curses)
+    print_commands.del_curses(curses)
     return command_results

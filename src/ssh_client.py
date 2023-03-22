@@ -9,8 +9,7 @@ def connect_to_server_with_ssh(device):
                            username=device['username'],
                            password=device['password'],
                            timeout=10)
-        # print(
-        #    f"Successfully connected with ssh to {device['ip_address']}")
+
         return ssh_client
     except paramiko.AuthenticationException:
         print(f"Invalid authentication for: {device['ip_address']}")
@@ -36,7 +35,7 @@ def get_modem_manufacturer_ssh(channel):
                 time.sleep(0.5)
                 command_response = channel.recv(
                     512).decode().replace('\n', ' ').split()[0]
-                print(command_response)
+
                 if command_response == '':
                     continue
                 if command_response not in results:
@@ -65,12 +64,13 @@ def connect_to_channel(ssh_client):
 
 
 def test_at_commands_with_ssh(device):
-    at_commands = __import__("at_commands")
+    config_data = __import__("config_data")
+    print_commands = __import__("print_commands")
     time = __import__('time')
     curses = __import__('curses')
-    commands = at_commands.get_at_commands(device['d__device_name'])
     device_name = device['d__device_name']
-    stdscr = at_commands.init_stdscr(curses)
+    commands = config_data.get_at_commands(device_name)
+    stdscr = print_commands.init_stdscr(curses)
     ssh_client = connect_to_server_with_ssh(device)
     channel = connect_to_channel(ssh_client)
     command_results = get_modem_manufacturer_ssh(channel)
@@ -95,7 +95,6 @@ def test_at_commands_with_ssh(device):
                     time.sleep(0.5)
             actual_response = channel.recv(
                 512).decode().replace('\n', ' ').split()[-1]
-            print(actual_response)
             if actual_response == expected_response:
                 status = 'Passed'
                 passed += 1
@@ -103,8 +102,8 @@ def test_at_commands_with_ssh(device):
                 status = 'Failed'
                 failed += 1
             total_commands = passed+failed
-            # at_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
-            #                             actual_response, passed, failed, total_commands)
+            print_commands.print_at_commands(stdscr, curses, device_name, command, expected_response,
+                                             actual_response, passed, failed, total_commands)
             command_results[i+1] = {
                 "command": command, "expected": expected_response, 'actual': actual_response, "status": status
             }
@@ -115,5 +114,5 @@ def test_at_commands_with_ssh(device):
     command_results['tests'] = tests_dict
     ssh_client.close()
     channel.close()
-    at_commands.del_curses(curses)
+    print_commands.del_curses(curses)
     return command_results
