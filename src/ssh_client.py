@@ -23,7 +23,7 @@ def connect_to_server_with_ssh(device):
         exit(1)
 
 
-def get_modem_manufacturer_ssh(channel):
+def get_modem_manufacturer_with_ssh(channel):
     time = __import__('time')
     manufacturer_dict = dict()
     manufacturer_commands = ['AT+GMI', "AT+GMM"]
@@ -63,18 +63,21 @@ def connect_to_channel(ssh_client):
     return channel
 
 
-def test_at_commands_with_ssh(device):
-    config_data = __import__("config_data")
-    print_commands = __import__("print_commands")
-    time = __import__('time')
-    curses = __import__('curses')
-    device_name = device['d__device_name']
-    commands = config_data.get_at_commands(device_name)
-    stdscr = print_commands.init_stdscr(curses)
-    ssh_client = connect_to_server_with_ssh(device)
-    channel = connect_to_channel(ssh_client)
-    command_results = get_modem_manufacturer_ssh(channel)
+def execute_extra_commands_with_ssh(extra_commands, channel, time):
+    for j in range(0, len(extra_commands)):
+        if extra_commands[j]['command'].isnumeric():
+            channel.send(f"{chr(int(extra_commands[j]['command']))}\n")
+        else:
+            channel.send(f"{extra_commands[j]['command']}\n")
+        time.sleep(0.5)
 
+
+def execute_at_commands_with_ssh(commands, channel, device_name):
+    print_commands = __import__("print_commands")
+    curses = __import__('curses')
+    time = __import__('time')
+    stdscr = print_commands.init_stdscr(curses)
+    command_results = get_modem_manufacturer_with_ssh(channel)
     failed = 0
     passed = 0
     for i in range(0, len(commands)):
@@ -86,13 +89,9 @@ def test_at_commands_with_ssh(device):
             time.sleep(0.5)
 
             if 'extras' in commands[i]:
-                extras = commands[i]['extras']
-                for j in range(0, len(extras)):
-                    if extras[j]['command'].isnumeric():
-                        channel.send(f"{chr(int(extras[j]['command']))}\n")
-                    else:
-                        channel.send(f"{extras[j]['command']}\n")
-                    time.sleep(0.5)
+                execute_extra_commands_with_ssh(
+                    commands[i]['extras'], channel, time)
+
             actual_response = channel.recv(
                 512).decode().replace('\n', ' ').split()[-1]
             if actual_response == expected_response:
@@ -112,7 +111,21 @@ def test_at_commands_with_ssh(device):
             continue
     tests_dict = {"passed": passed, "failed": failed, 'total': total_commands}
     command_results['tests'] = tests_dict
+    print_commands.del_curses(curses)
+    return command_results
+
+
+def test_at_commands_with_ssh(device):
+    config_data = __import__("config_data")
+    device_name = device['d__device_name']
+
+    commands = config_data.get_at_commands(device_name)
+    ssh_client = connect_to_server_with_ssh(device)
+    channel = connect_to_channel(ssh_client)
+    command_results = execute_at_commands_with_ssh(
+        commands, channel, device_name)
+
     ssh_client.close()
     channel.close()
-    print_commands.del_curses(curses)
+
     return command_results
