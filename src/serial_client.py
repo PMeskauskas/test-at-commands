@@ -4,6 +4,7 @@ class SerialClient:
     def __init__(self, device):
         config_data = __import__("config_data")
         self.time = __import__("time")
+        self.serial = __import__('serial')
         self.device = device
         self.commands = config_data.ConfigData(
             self.device['d__device_name']).commands
@@ -14,41 +15,60 @@ class SerialClient:
         self.serial_client.write(b"sudo systemctl stop ModemManager\r")
         self.get_modem_manufacturer_with_serial()
         self.execute_at_commands_with_serial()
+        self.close_serial()
 
     def connect_to_server_with_serial(self):
         try:
-            serial = __import__('serial')
-            self.serial_client = serial.Serial(self.device['serial_port'],
-                                               baudrate=115200,
-                                               stopbits=serial.STOPBITS_ONE,
-                                               bytesize=serial.EIGHTBITS,
-                                               parity=serial.PARITY_NONE,
-                                               timeout=0.5)
+
+            self.serial_client = self.serial.Serial(self.device['serial_port'],
+                                                    baudrate=115200,
+                                                    stopbits=self.serial.STOPBITS_ONE,
+                                                    bytesize=self.serial.EIGHTBITS,
+                                                    parity=self.serial.PARITY_NONE,
+                                                    timeout=1,
+                                                    write_timeout=0.5)
         except TimeoutError:
             print(
                 f"Was not able to connect with serial, PORT: {self.device['serial_port']}")
             exit(1)
-        except serial.serialutil.SerialException:
+        except self.serial.SerialException:
             print(
                 f"Could not open port with serial, PORT: {self.device['serial_port']} (Check permissions.)")
+            exit(1)
+        except:
+            print(
+                f"Error when connecting with serial")
             exit(1)
 
     def get_modem_manufacturer_with_serial(self):
         manufacturer_commands = ['AT+GMI', "AT+GMM"]
         results = list()
+
         for i in range(0, len(manufacturer_commands)):
+            attempts = 0
             while True:
                 try:
+                    attempts+1
+                    if attempts > 50:
+                        raise TimeoutError
                     self.serial_client.write(
                         f"{manufacturer_commands[i]}\r".encode())
 
-                    command_response = self.serial_client.read(
-                        512).decode().replace('\n', ' ').split()[0]
-                    if command_response == '':
+                    command_list = self.serial_client.read(
+                        512).decode().replace('\n', ' ').split()
+                    if command_list[0] == '':
                         continue
+                    command_response = command_list[0]
+                    if command_response == manufacturer_commands[i]:
+                        command_response = command_list[1]
                     if command_response not in results:
                         results.insert(i, command_response)
                         break
+
+                except TimeoutError:
+                    self.close_serial()
+                    print("Lost connection with serial")
+                    exit(1)
                 except:
                     continue
         self.command_results['manufacturer'] = {
@@ -63,14 +83,19 @@ class SerialClient:
 
         failed = 0
         passed = 0
+        total_commands = 0
         for i in range(0, len(self.commands)):
+            attempts = 0
             while i+1 not in self.command_results:
+
                 command = self.commands[i]['command']
                 try:
+                    attempts += 1
+                    if attempts > 50:
+                        raise TimeoutError
                     command = self.commands[i]['command']
                     expected_response = self.commands[i]['expected']
                     self.serial_client.write(f"{command}\r".encode())
-
                     if 'extras' in self.commands[i]:
                         self.execute_extra_commands_with_serial(
                             self.commands[i]['extras'])
@@ -94,15 +119,20 @@ class SerialClient:
                     self.command_results[i+1] = {
                         "command": command, "expected": expected_response, 'actual': actual_response, "status": status
                     }
-                    self.time.sleep(2)
+
+                except TimeoutError:
+                    tests_dict = {"passed": passed,
+                                  "failed": failed, 'total': total_commands}
+                    self.command_results['tests'] = tests_dict
+                    print_object.del_curses()
+                    print("Lost connection with serial")
+                    return
                 except:
                     continue
 
         tests_dict = {"passed": passed,
                       "failed": failed, 'total': total_commands}
         self.command_results['tests'] = tests_dict
-        self.serial_client.close()
-        del self.serial_client
         print_object.del_curses()
 
     def execute_extra_commands_with_serial(self, extra_commands):
@@ -114,3 +144,7 @@ class SerialClient:
             else:
                 self.serial_client.write(
                     f"{extra_commands[j]['command']}\r".encode())
+
+    def close_serial(self):
+        self.serial_client.close()
+        del self.serial_client

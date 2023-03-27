@@ -3,6 +3,76 @@
         {
             "RUTX11": [
                 {
+                    "command": "ATI",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMI",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMM",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMM",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CPAS",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CEER",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPS?",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CREG?",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CTZU",
+                    "expected": "OK",
+                    "argument": "1"
+                },
+                {
+                    "command": "AT+QNWINFO",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
                     "command": "AT+CMGF",
                     "expected": "OK",
                     "argument": "1"
@@ -23,6 +93,76 @@
             ],
             "TRM240": [
                 {
+                    "command": "ATI",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMI",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMM",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMM",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CPAS",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CEER",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPS?",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CREG?",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CTZU",
+                    "expected": "OK",
+                    "argument": "1"
+                },
+                {
+                    "command": "AT+QNWINFO",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
                     "command": "AT+CMGF",
                     "expected": "OK",
                     "argument": "1"
@@ -30,7 +170,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+3706000000",
+                    "argument": "+37063841960",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -43,19 +183,22 @@
             ],
             "RUT955": [
                 {
-                    "command": "AT",
+                    "command": "AT+CMGF",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "1"
                 },
                 {
-                    "command": "ATI",
+                    "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+GMI",
-                    "expected": "OK",
-                    "argument": ""
+                    "argument": "+37060000000",
+                    "extras": [
+                        {
+                            "command": "Sample text"
+                        },
+                        {
+                            "command": "26"
+                        }
+                    ]
                 }
             ]
         }

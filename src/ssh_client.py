@@ -1,6 +1,7 @@
 class SshClient:
     def __init__(self, device):
         config_data = __import__('config_data')
+        self.socket = __import__('socket')
         self.time = __import__('time')
         self.device = device
         self.commands = config_data.ConfigData(
@@ -13,9 +14,7 @@ class SshClient:
         self.connect_to_channel()
         self.get_modem_manufacturer_with_ssh()
         self.execute_at_commands_with_ssh()
-
-        self.ssh_client.close()
-        self.channel.close()
+        self.close_ssh()
 
     def connect_to_server_with_ssh(self):
         try:
@@ -40,6 +39,7 @@ class SshClient:
 
     def connect_to_channel(self):
         self.channel = self.ssh_client.invoke_shell()
+        self.channel.settimeout(2)
         self.channel.recv(512)
         self.channel.send("/etc/init.d/gsmd stop\n")
         self.channel.recv(512)
@@ -57,19 +57,23 @@ class SshClient:
                 for i in range(0, len(manufacturer_commands)):
                     self.channel.send(f"{manufacturer_commands[i]}\n")
                     self.time.sleep(0.5)
-                    command_response = self.channel.recv(
-                        512).decode().replace('\n', ' ').split()[0]
-
-                    if command_response == '':
+                    command_list = self.channel.recv(
+                        512).decode().replace('\n', ' ').split()
+                    if command_list[0] == '':
                         continue
+                    command_response = command_list[0]
+                    if command_response == manufacturer_commands[i]:
+                        command_response = command_list[1]
                     if command_response not in results:
                         results.insert(i, command_response)
                 self.command_results['manufacturer'] = {
                     "manufacturer": results[0],
                     'model': results[1],
                 }
-            except:
-                continue
+            except self.socket.timeout:
+                print("Lost connection to server with SSH")
+                self.close_ssh()
+                exit(1)
 
     def execute_at_commands_with_ssh(self):
         print_commands = __import__("print_commands")
@@ -78,6 +82,7 @@ class SshClient:
 
         failed = 0
         passed = 0
+        total_commands = 0
         for i in range(0, len(self.commands)):
             try:
                 command = self.commands[i]['command']
@@ -104,9 +109,15 @@ class SshClient:
                 self.command_results[i+1] = {
                     "command": command, "expected": expected_response, 'actual': actual_response, "status": status
                 }
-                self.time.sleep(2)
-            except:
-                continue
+                self.time.sleep(0.5)
+            except self.socket.timeout:
+                tests_dict = {"passed": passed,
+                              "failed": failed, 'total': total_commands}
+                self.command_results['tests'] = tests_dict
+                print_object.del_curses()
+                print("Lost connection to server with SSH")
+                return
+
         tests_dict = {"passed": passed,
                       "failed": failed, 'total': total_commands}
         self.command_results['tests'] = tests_dict
@@ -120,3 +131,7 @@ class SshClient:
             else:
                 self.channel.send(f"{extra_commands[j]['command']}\n")
             self.time.sleep(0.5)
+
+    def close_ssh(self):
+        self.ssh_client.close()
+        self.channel.close()

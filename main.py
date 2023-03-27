@@ -23,8 +23,8 @@ def main():
     sys = __import__('sys')
     sys.path.append('src')
     argument_parser = __import__("argument_parser")
-    args = argument_parser.parse_arguments()
-    check_connection_type(vars(args))
+    args = argument_parser.ArgumentParser()
+    check_connection_type(args.arguments)
 
 
 if __name__ == '__main__':
