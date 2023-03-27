@@ -122,6 +122,7 @@ class SshClient:
                       "failed": failed, 'total': total_commands}
         self.command_results['tests'] = tests_dict
         print_object.del_curses()
+        # ssss
 
     def execute_extra_commands_with_ssh(self, extra_commands):
         for j in range(0, len(extra_commands)):
