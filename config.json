@@ -3,17 +3,17 @@
         {
             "RUTX11": [
                 {
-                    "command": "ATI",
+                    "command": "AT+CPIN",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "1234"
                 },
                 {
-                    "command": "AT+GMI",
+                    "command": "AT+CPWD",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "SC,1234,1234"
                 },
                 {
-                    "command": "AT+GMM",
+                    "command": "AT+CIMI",
                     "expected": "OK",
                     "argument": ""
                 },
@@ -93,69 +93,19 @@
             ],
             "TRM240": [
                 {
-                    "command": "ATI",
+                    "command": "AT+CPIN",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "1234"
                 },
                 {
-                    "command": "AT+GMI",
+                    "command": "AT+CPWD",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "SC,1234,1234"
                 },
                 {
-                    "command": "AT+GMM",
+                    "command": "AT+CIMI",
                     "expected": "OK",
                     "argument": ""
-                },
-                {
-                    "command": "AT+GMR",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGMM",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGMR",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+GSN",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CGSN",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CPAS",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CEER",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+COPS?",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CREG?",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+CTZU",
-                    "expected": "OK",
-                    "argument": "1"
                 },
                 {
                     "command": "AT+QNWINFO",
@@ -170,7 +120,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37063841960",
+                    "argument": "+37060000000",
                     "extras": [
                         {
                             "command": "Sample text"

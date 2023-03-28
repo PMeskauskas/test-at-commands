@@ -1,6 +1,9 @@
+import argparse
+
+
 class ArgumentParser:
     def __init__(self):
-        self.argparse = __import__('argparse')
+
         self.arguments = None
         self.parse_arguments()
         self.adjust_case_sensitivity()
@@ -8,8 +11,8 @@ class ArgumentParser:
 
     def parse_arguments(self):
 
-        parser = self.argparse.ArgumentParser(description="Program to automatically test AT commands",
-                                              formatter_class=self.argparse.ArgumentDefaultsHelpFormatter)
+        parser = argparse.ArgumentParser(description="Program to automatically test AT commands",
+                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument("-d" "--device-name", required=True, action="store",
                             help="Device name (for example: RUTX11, TRM240)")
         parser.add_argument("-c", "--connection-type", required=True,

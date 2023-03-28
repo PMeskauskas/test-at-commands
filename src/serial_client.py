@@ -1,12 +1,13 @@
+import time
+import serial
+from config_data import ConfigData
+from print_commands import PrintCommands
 
 
 class SerialClient:
     def __init__(self, device):
-        config_data = __import__("config_data")
-        self.time = __import__("time")
-        self.serial = __import__('serial')
         self.device = device
-        self.commands = config_data.ConfigData(
+        self.commands = ConfigData(
             self.device['d__device_name']).commands
         self.serial_client = None
         self.command_results = dict()
@@ -20,18 +21,18 @@ class SerialClient:
     def connect_to_server_with_serial(self):
         try:
 
-            self.serial_client = self.serial.Serial(self.device['serial_port'],
-                                                    baudrate=115200,
-                                                    stopbits=self.serial.STOPBITS_ONE,
-                                                    bytesize=self.serial.EIGHTBITS,
-                                                    parity=self.serial.PARITY_NONE,
-                                                    timeout=1,
-                                                    write_timeout=0.5)
+            self.serial_client = serial.Serial(self.device['serial_port'],
+                                               baudrate=115200,
+                                               stopbits=serial.STOPBITS_ONE,
+                                               bytesize=serial.EIGHTBITS,
+                                               parity=serial.PARITY_NONE,
+                                               timeout=1,
+                                               write_timeout=0.5)
         except TimeoutError:
             print(
                 f"Was not able to connect with serial, PORT: {self.device['serial_port']}")
             exit(1)
-        except self.serial.SerialException:
+        except serial.SerialException:
             print(
                 f"Could not open port with serial, PORT: {self.device['serial_port']} (Check permissions.)")
             exit(1)
@@ -56,11 +57,13 @@ class SerialClient:
 
                     command_list = self.serial_client.read(
                         512).decode().replace('\n', ' ').split()
+
                     if command_list[0] == '':
                         continue
                     command_response = command_list[0]
                     if command_response == manufacturer_commands[i]:
                         command_response = command_list[1]
+
                     if command_response not in results:
                         results.insert(i, command_response)
                         break
@@ -77,21 +80,24 @@ class SerialClient:
         }
 
     def execute_at_commands_with_serial(self):
-        print_commands = __import__("print_commands")
 
-        print_object = print_commands.PrintCommands()
+        print_object = PrintCommands()
 
         failed = 0
         passed = 0
         total_commands = 0
         for i in range(0, len(self.commands)):
             attempts = 0
-            while i+1 not in self.command_results:
 
+            start_time = time.time()
+            while i+1 not in self.command_results:
                 command = self.commands[i]['command']
                 try:
+                    current_time = time.time() - start_time
                     attempts += 1
                     if attempts > 50:
+                        raise TimeoutError
+                    if current_time > 5:
                         raise TimeoutError
                     command = self.commands[i]['command']
                     expected_response = self.commands[i]['expected']
@@ -137,7 +143,7 @@ class SerialClient:
 
     def execute_extra_commands_with_serial(self, extra_commands):
         for j in range(0, len(extra_commands)):
-            self.time.sleep(0.5)
+            time.sleep(0.5)
             if extra_commands[j]['command'].isnumeric():
                 self.serial_client.write(
                     f"{chr(int(extra_commands[j]['command']))}\r".encode())

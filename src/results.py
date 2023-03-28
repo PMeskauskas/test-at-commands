@@ -1,3 +1,7 @@
+from datetime import datetime
+import csv
+
+
 class Results:
     def __init__(self, device_name, command_results):
         self.device_name = device_name
@@ -11,8 +15,7 @@ class Results:
         self.csv_file.close()
 
     def create_csv_filename(self):
-        datetime = __import__('datetime')
-        now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        now = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         self.filename = f"{self.device_name}_{now}.csv"
 
     def open_csv_file(self):
@@ -20,7 +23,6 @@ class Results:
 
     def write_to_csv_file(self):
         try:
-            csv = __import__("csv")
             writer = csv.writer(self.csv_file)
 
             manufacturer = self.command_results['manufacturer']['manufacturer']

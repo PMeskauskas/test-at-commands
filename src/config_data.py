@@ -1,3 +1,6 @@
+import json
+
+
 class ConfigData:
     def __init__(self, device_name):
         self.device_name = device_name
@@ -22,7 +25,6 @@ class ConfigData:
 
     def load_configuration_data(self):
         try:
-            json = __import__("json")
             self.data = json.load(self.config_file)
         except json.JSONDecodeError:
             print('Failed to load JSON configuration data')
@@ -48,14 +50,19 @@ class ConfigData:
             if not arguments_exists:
                 exit(1)
 
-            argument = self.commands[i]['argument']
+            arguments = self.commands[i]['argument']
             command = self.commands[i]['command']
-
-            if argument != "":
-                if argument.isnumeric() or argument == "?":
-                    self.commands[i]["command"] = f"{command}={argument}"
-                else:
-                    self.commands[i]["command"] = f"{command}=\"{argument}\""
+            arguments = arguments.split(',')
+            parsed_argument = f"{command}="
+            for argument in arguments:
+                argument = argument.replace('"', '')
+                if argument != "":
+                    if argument.isnumeric() or argument == "?":
+                        parsed_argument += f"{argument},"
+                    else:
+                        parsed_argument += f"\"{argument}\","
+            parsed_argument = parsed_argument[:-1]
+            self.commands[i]["command"] = parsed_argument
 
     def check_if_arguments_exists(self, command):
         if not "command" in command:
