@@ -1,0 +1,23 @@
+Manufacturer,Model
+Quectel,EC21
+
+Number,Test,Expected output,Actual output,Status
+1,AT+CPIN=1234,ERROR,ERROR,Passed
+2,"AT+CPWD=""SC"",1234,1234",ERROR,ERROR,Passed
+3,AT+CIMI,OK,ERROR,Failed
+4,AT+GMR,OK,OK,Passed
+5,AT+CGMM,OK,OK,Passed
+6,AT+CGMR,OK,OK,Passed
+7,AT+GSN,OK,OK,Passed
+8,AT+CGSN,OK,OK,Passed
+9,AT+CPAS,OK,OK,Passed
+10,AT+CEER,OK,ERROR,Failed
+11,AT+COPS?,OK,OK,Passed
+12,AT+CREG=1,OK,OK,Passed
+13,AT+CTZU=1,OK,OK,Passed
+14,AT+QNWINFO,OK,OK,Passed
+15,AT+CMGF=1,OK,ERROR,Failed
+
+Passed tests,12
+Failed tests,3
+Total tests,15

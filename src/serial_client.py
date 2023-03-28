@@ -108,7 +108,7 @@ class SerialClient:
                         20480).decode().replace('\n', ' ')
                     if response == '':
                         continue
-                    print(response)
+
                     actual_response = self.find_actual_response(response)
                     if actual_response == expected_response:
                         status = 'Passed'
