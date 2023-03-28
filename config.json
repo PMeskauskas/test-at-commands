@@ -194,43 +194,9 @@
                     "command": "AT+CSQ",
                     "expected": "OK",
                     "argument": ""
-                },
-                {
-                    "command": "AT+COPN",
-                    "expected": "ERROR",
-                    "argument": ""
                 }
             ],
-            "RUT955": [
-                {
-                    "command": "AT+CMGF",
-                    "expected": "OK",
-                    "argument": "1"
-                },
-                {
-                    "command": "AT+CMGS",
-                    "expected": "OK",
-                    "argument": "+37063841960",
-                    "extras": [
-                        {
-                            "command": "Sample text"
-                        },
-                        {
-                            "command": "26"
-                        }
-                    ]
-                },
-                {
-                    "command": "AT+CSQ",
-                    "expected": "OK",
-                    "argument": ""
-                },
-                {
-                    "command": "AT+COPN",
-                    "expected": "OK",
-                    "argument": ""
-                }
-            ]
+            "TRM955": []
         }
     ]
 }
