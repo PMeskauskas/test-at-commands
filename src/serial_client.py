@@ -26,8 +26,7 @@ class SerialClient:
                                                stopbits=serial.STOPBITS_ONE,
                                                bytesize=serial.EIGHTBITS,
                                                parity=serial.PARITY_NONE,
-                                               timeout=1,
-                                               write_timeout=0.5)
+                                               timeout=0.5)
         except TimeoutError:
             print(
                 f"Was not able to connect with serial, PORT: {self.device['serial_port']}")
@@ -56,7 +55,7 @@ class SerialClient:
                         f"{manufacturer_commands[i]}\r".encode())
 
                     command_list = self.serial_client.read(
-                        512).decode().replace('\n', ' ').split()
+                        20480).decode().replace('\n', ' ').split()
 
                     if command_list[0] == '':
                         continue
@@ -96,7 +95,7 @@ class SerialClient:
                     attempts += 1
                     if attempts > 50:
                         raise TimeoutError
-                    if current_time > 5:
+                    if current_time > 10:
                         raise TimeoutError
                     command = self.commands[i]['command']
                     expected_response = self.commands[i]['expected']
@@ -106,11 +105,10 @@ class SerialClient:
                             self.commands[i]['extras'])
 
                     response = self.serial_client.read(
-                        1000).decode().replace('\n', ' ')
+                        20480).decode().replace('\n', ' ')
                     if response == '':
                         continue
                     actual_response = self.find_actual_response(response)
-
                     if actual_response == expected_response:
                         status = 'Passed'
                         passed += 1

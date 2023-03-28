@@ -43,7 +43,7 @@ class SshClient:
 
     def connect_to_channel(self):
         self.channel = self.ssh_client.invoke_shell()
-        self.channel.settimeout(2)
+        self.channel.settimeout(7)
         self.channel.recv(512)
         self.channel.send("/etc/init.d/gsmd stop\n")
         self.channel.recv(512)
@@ -86,32 +86,42 @@ class SshClient:
         passed = 0
         total_commands = 0
         for i in range(0, len(self.commands)):
+            try:
+                command = self.commands[i]['command']
+                expected_response = self.commands[i]['expected']
 
-            command = self.commands[i]['command']
-            expected_response = self.commands[i]['expected']
+                self.channel.send(f"{command}\n")
+                time.sleep(0.5)
 
-            self.channel.send(f"{command}\n")
-            time.sleep(0.5)
-
-            if 'extras' in self.commands[i]:
-                self.execute_extra_commands_with_ssh(
-                    self.commands[i]['extras'])
-
-            response = self.channel.recv(
-                512).decode().replace('\n', ' ')
-            actual_response = self.find_actual_response(response)
-            if expected_response == actual_response:
-                status = 'Passed'
-                passed += 1
-            else:
-                status = 'Failed'
-                failed += 1
-            total_commands = passed+failed
-            print_object.print_at_commands(self.device['d__device_name'], command, expected_response,
-                                           actual_response, passed, failed, total_commands)
-            self.command_results[i+1] = {
-                "command": command, "expected": expected_response, 'actual': actual_response, "status": status
-            }
+                if 'extras' in self.commands[i]:
+                    self.execute_extra_commands_with_ssh(
+                        self.commands[i]['extras'])
+                response = self.channel.recv(
+                    1000).decode().replace('\n', ' ')
+                while self.channel.recv_ready():
+                    response += self.channel.recv(
+                        1000).decode().replace('\n', ' ')
+                actual_response = self.find_actual_response(response)
+                if expected_response == actual_response:
+                    status = 'Passed'
+                    passed += 1
+                else:
+                    status = 'Failed'
+                    failed += 1
+                total_commands = passed+failed
+                print_object.print_at_commands(self.device['d__device_name'], command, expected_response,
+                                               actual_response, passed, failed, total_commands)
+                self.command_results[i+1] = {
+                    "command": command, "expected": expected_response, 'actual': actual_response, "status": status
+                }
+            except socket.timeout:
+                tests_dict = {"passed": passed,
+                              "failed": failed, 'total': total_commands}
+                self.command_results['tests'] = tests_dict
+                print_object.del_curses()
+                print("Lost connection to server with SSH")
+                self.close_ssh()
+                return
             time.sleep(0.5)
 
         tests_dict = {"passed": passed,

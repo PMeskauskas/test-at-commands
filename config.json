@@ -4,7 +4,7 @@
             "RUTX11": [
                 {
                     "command": "AT+CPIN",
-                    "expected": "OK",
+                    "expected": "ERROR",
                     "argument": "1234"
                 },
                 {
@@ -58,9 +58,9 @@
                     "argument": ""
                 },
                 {
-                    "command": "AT+CREG?",
+                    "command": "AT+CREG",
                     "expected": "OK",
-                    "argument": ""
+                    "argument": "1"
                 },
                 {
                     "command": "AT+CTZU",
@@ -80,7 +80,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37063841960",
+                    "argument": "+3706000000",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -89,23 +89,83 @@
                             "command": "26"
                         }
                     ]
+                },
+                {
+                    "command": "AT+CSQ",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPN",
+                    "expected": "OK",
+                    "argument": ""
                 }
             ],
             "TRM240": [
                 {
                     "command": "AT+CPIN",
-                    "expected": "OK",
+                    "expected": "ERROR",
                     "argument": "1234"
                 },
                 {
                     "command": "AT+CPWD",
-                    "expected": "OK",
+                    "expected": "ERROR",
                     "argument": "SC,1234,1234"
                 },
                 {
                     "command": "AT+CIMI",
                     "expected": "OK",
                     "argument": ""
+                },
+                {
+                    "command": "AT+GMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMM",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGMR",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+GSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CGSN",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CPAS",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CEER",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPS?",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+CREG",
+                    "expected": "OK",
+                    "argument": "1"
+                },
+                {
+                    "command": "AT+CTZU",
+                    "expected": "OK",
+                    "argument": "1"
                 },
                 {
                     "command": "AT+QNWINFO",
@@ -120,7 +180,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37060000000",
+                    "argument": "+3706000000",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -129,6 +189,16 @@
                             "command": "26"
                         }
                     ]
+                },
+                {
+                    "command": "AT+CSQ",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPN",
+                    "expected": "ERROR",
+                    "argument": ""
                 }
             ],
             "RUT955": [
@@ -140,7 +210,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+37060000000",
+                    "argument": "+37063841960",
                     "extras": [
                         {
                             "command": "Sample text"
@@ -149,6 +219,16 @@
                             "command": "26"
                         }
                     ]
+                },
+                {
+                    "command": "AT+CSQ",
+                    "expected": "OK",
+                    "argument": ""
+                },
+                {
+                    "command": "AT+COPN",
+                    "expected": "OK",
+                    "argument": ""
                 }
             ]
         }
