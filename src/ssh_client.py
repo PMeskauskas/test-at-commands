@@ -97,9 +97,10 @@ class SshClient:
                 self.execute_extra_commands_with_ssh(
                     self.commands[i]['extras'])
 
-            actual_response = self.channel.recv(
-                512).decode().replace('\n', ' ').split()[-1]
-            if actual_response == expected_response:
+            response = self.channel.recv(
+                512).decode().replace('\n', ' ')
+            actual_response = self.find_actual_response(response)
+            if expected_response == actual_response:
                 status = 'Passed'
                 passed += 1
             else:
@@ -126,6 +127,12 @@ class SshClient:
             else:
                 self.channel.send(f"{extra_commands[j]['command']}\n")
             time.sleep(0.5)
+
+    def find_actual_response(self, response):
+        if 'ERROR' in response:
+            return 'ERROR'
+        if 'OK' in response:
+            return 'OK'
 
     def close_ssh(self):
         self.ssh_client.close()

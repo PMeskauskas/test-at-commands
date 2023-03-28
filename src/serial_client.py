@@ -88,7 +88,6 @@ class SerialClient:
         total_commands = 0
         for i in range(0, len(self.commands)):
             attempts = 0
-
             start_time = time.time()
             while i+1 not in self.command_results:
                 command = self.commands[i]['command']
@@ -106,13 +105,13 @@ class SerialClient:
                         self.execute_extra_commands_with_serial(
                             self.commands[i]['extras'])
 
-                    actual_response = self.serial_client.read(
-                        1000).decode().replace('\n', ' ').split()[-1]
-
-                    if actual_response == '':
+                    response = self.serial_client.read(
+                        1000).decode().replace('\n', ' ')
+                    if response == '':
                         continue
+                    actual_response = self.find_actual_response(response)
 
-                    if actual_response == self.commands[i]['expected']:
+                    if actual_response == expected_response:
                         status = 'Passed'
                         passed += 1
                     else:
@@ -150,6 +149,12 @@ class SerialClient:
             else:
                 self.serial_client.write(
                     f"{extra_commands[j]['command']}\r".encode())
+
+    def find_actual_response(self, response):
+        if 'ERROR' in response:
+            return 'ERROR'
+        if 'OK' in response:
+            return 'OK'
 
     def close_serial(self):
         self.serial_client.close()
