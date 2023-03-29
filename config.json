@@ -203,7 +203,7 @@
             ],
             "TRM955": [
                 {
-                    "command": "AT+COPN",
+                    "command": "AT+CSQ",
                     "expected": "OK",
                     "argument": ""
                 }

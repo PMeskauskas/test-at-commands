@@ -8,7 +8,6 @@ import sys
 def check_connection_type(device):
     config_object = ConfigData(
         device['d__device_name'], device['enable_ftp'])
-
     match device['connection_type']:
         case 'ssh':
             ssh_client = __import__('ssh_client')

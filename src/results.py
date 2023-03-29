@@ -16,14 +16,11 @@ class Results:
 
     def create_csv_filename(self):
         now = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-        self.filename = f"results/{self.device_name}_{now}.csv"
+        self.filename = f"{self.device_name}_{now}.csv"
 
     def open_csv_file(self):
-        try:
-            self.csv_file = open(f"{self.filename}", 'a+', newline='')
-        except:
-            print("Failed to open csv file")
-            exit(1)
+
+        self.csv_file = open(f"results/{self.filename}", 'w+', newline='')
 
     def write_to_csv_file(self):
         try:
