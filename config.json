@@ -1,4 +1,9 @@
 {
+    "ftp_server": {
+        "hostname": "84.15.249.182",
+        "username": "ftpakademija",
+        "password": "Akademija159!"
+    },
     "device": [
         {
             "RUTX11": [
@@ -196,7 +201,13 @@
                     "argument": ""
                 }
             ],
-            "RUT955": []
+            "TRM955": [
+                {
+                    "command": "AT+COPN",
+                    "expected": "OK",
+                    "argument": ""
+                }
+            ]
         }
     ]
 }

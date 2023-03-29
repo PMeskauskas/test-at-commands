@@ -2,17 +2,19 @@ import json
 
 
 class ConfigData:
-    def __init__(self, device_name):
+    def __init__(self, device_name, enable_ftp):
         self.device_name = device_name
         self.config_file_name = 'config.json'
         self.config_file = None
         self.data = None
         self.commands = None
-
+        self.ftp_server_data = None
         self.open_configuration_file()
         self.load_configuration_data()
         self.get_commands_by_device_name()
-        self.parse_configuration_data()
+        self.parse_device_configuration_data()
+        if enable_ftp:
+            self.get_ftp_server_data()
 
         self.config_file.close()
 
@@ -42,10 +44,32 @@ class ConfigData:
             print(f"Available device configurations: {available_devices}")
             exit(1)
 
-    def parse_configuration_data(self):
+    def get_ftp_server_data(self):
+        try:
+            self.ftp_server_data = self.data['ftp_server']
+            self.check_if_ftp_server_arguments_exists()
+        except KeyError:
+            print(
+                f"No FTP server configuration data found")
+            exit(1)
+
+    def check_if_ftp_server_arguments_exists(self):
+        if not "hostname" in self.ftp_server_data:
+            print("Missing 'hostname' argument in configuration file")
+            return False
+        if not "username" in self.ftp_server_data:
+            print("Missing 'username' argument in configuration file")
+            return False
+        if not "password" in self.ftp_server_data:
+            print("Missing 'password' argument in configuration file")
+            return False
+        return True
+
+    def parse_device_configuration_data(self):
 
         for i in range(0, len(self.commands)):
-            arguments_exists = self.check_if_arguments_exists(self.commands[i])
+            arguments_exists = self.check_if_command_arguments_exists(
+                self.commands[i])
 
             if not arguments_exists:
                 exit(1)
@@ -64,7 +88,7 @@ class ConfigData:
             parsed_argument = parsed_argument[:-1]
             self.commands[i]["command"] = parsed_argument
 
-    def check_if_arguments_exists(self, command):
+    def check_if_command_arguments_exists(self, command):
         if not "command" in command:
             print("Missing 'command' argument in configuration file")
             return False

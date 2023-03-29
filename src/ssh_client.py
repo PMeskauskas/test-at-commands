@@ -1,4 +1,3 @@
-from config_data import ConfigData
 from print_commands import PrintCommands
 import socket
 import time
@@ -6,11 +5,10 @@ import paramiko
 
 
 class SshClient:
-    def __init__(self, device):
+    def __init__(self, device, commands):
 
         self.device = device
-        self.commands = ConfigData(
-            self.device['d__device_name']).commands
+        self.commands = commands
 
         self.ssh_client = None
         self.channel = None

@@ -16,10 +16,14 @@ class Results:
 
     def create_csv_filename(self):
         now = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-        self.filename = f"{self.device_name}_{now}.csv"
+        self.filename = f"results/{self.device_name}_{now}.csv"
 
     def open_csv_file(self):
-        self.csv_file = open(f"results/{self.filename}", 'a+', newline='')
+        try:
+            self.csv_file = open(f"{self.filename}", 'a+', newline='')
+        except:
+            print("Failed to open csv file")
+            exit(1)
 
     def write_to_csv_file(self):
         try:
@@ -50,5 +54,5 @@ class Results:
             writer.writerow(['Failed tests', failed_tests])
             writer.writerow(['Total tests', total_tests])
         except:
-            print("Failed to write to csv file.")
+            print("Failed to write to csv file")
             exit(1)

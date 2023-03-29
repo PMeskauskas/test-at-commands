@@ -1,14 +1,12 @@
 import time
 import serial
-from config_data import ConfigData
 from print_commands import PrintCommands
 
 
 class SerialClient:
-    def __init__(self, device):
+    def __init__(self, device, commands):
         self.device = device
-        self.commands = ConfigData(
-            self.device['d__device_name']).commands
+        self.commands = commands
         self.serial_client = None
         self.command_results = dict()
 
