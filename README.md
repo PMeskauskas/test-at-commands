@@ -1,5 +1,5 @@
 # test-at-commands
-Program for automatically testing AT commands with serial or ssh protocols
+Program for automatically testing AT commands with serial/ssh protocols and an option to upload them to FTP server. 
 
 # installation
 1. Download and extract the files to a directory
@@ -12,7 +12,8 @@ pip install -r requirements.txt
 4. Run the program with parameters:
 ```
 $ sudo python3 main.py -h
-usage: main.py [-h] -d--device-name D__DEVICE_NAME -c CONNECTION_TYPE [-p SERIAL_PORT] [--ip-address [IP_ADDRESS]] [-u [USERNAME]] [-P [PASSWORD]]
+usage: main.py [-h] -d--device-name D__DEVICE_NAME -c CONNECTION_TYPE [-p SERIAL_PORT] [--ip-address [IP_ADDRESS]]
+               [-u [USERNAME]] [-P [PASSWORD]] [--enable_ftp [ENABLE_FTP]]
 
 Program to automatically test AT commands
 
@@ -30,10 +31,12 @@ options:
                         Server username (default: root)
   -P [PASSWORD], --password [PASSWORD]
                         Server password (default: Admin123)
+  --enable_ftp [ENABLE_FTP]
+                        Option to upload to FTP server (True,False) (default: false)
 ```
 # Example with ssh to send sms messages
 1. Connect your device to the ethernet cable
-2. In the configuration file **config.json** enter the device model with commands you want to test. In the data structure you need to specify what commands to run, the expected result, arguments and what extra commands to use (if arguments or extra commands not needed, then leave blank). An example of the data structure in **config.json**:
+2. In the configuration file **config.json** enter the device model with commands you want to test. In the data structure you need to specify what commands to run, the expected result, arguments and what extra commands to use (if arguments or extra commands not needed, then leave them blank). An example of the data structure is in **config.json**:
 
 ![image](https://user-images.githubusercontent.com/88384951/226626282-28dc7688-afd7-46c3-a35d-6714b1b77cf7.png)
 
@@ -44,7 +47,6 @@ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 ```
 4. When testing you should be able to see what model is currently being tested, what commands  are currently being tested, command expected output, command actual output, how many tests currently passed or failed and the total number of tests.
 ```
-$ python3 main.py -d RUTX11 -c ssh --ip-address 192.168.1.1 -u root -P Admin123
 Testing product: RUTX11
 Currently testing: ATE1
 Expected response: OK
