@@ -1,8 +1,8 @@
 {
     "ftp_server": {
-        "hostname": "84.15.249.182",
-        "username": "ftpakademija",
-        "password": "Akademija159!"
+        "hostname": "localhost",
+        "username": "ftpuser",
+        "password": "ftpuser"
     },
     "device": [
         {
@@ -201,7 +201,7 @@
                     "argument": ""
                 }
             ],
-            "TRM955": [
+            "RUT955": [
                 {
                     "command": "AT+CSQ",
                     "expected": "OK",
