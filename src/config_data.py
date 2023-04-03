@@ -2,21 +2,12 @@ import json
 
 
 class ConfigData:
-    def __init__(self, device_name, enable_ftp):
-        self.device_name = device_name
-        self.config_file_name = 'config.json'
+    def __init__(self, config_file_name, *args, **kwargs):
+        self.config_file_name = config_file_name
         self.config_file = None
         self.data = None
         self.commands = None
         self.ftp_server_data = None
-        self.open_configuration_file()
-        self.load_configuration_data()
-        self.get_commands_by_device_name()
-        self.parse_device_configuration_data()
-        if enable_ftp:
-            self.get_ftp_server_data()
-
-        self.config_file.close()
 
     def open_configuration_file(self):
         try:
@@ -32,12 +23,12 @@ class ConfigData:
             print('Failed to load JSON configuration data')
             exit(1)
 
-    def get_commands_by_device_name(self):
+    def get_commands_by_device_name(self, device_name):
         try:
-            self.commands = self.data['device'][0][self.device_name]
+            self.commands = self.data['device'][0][device_name]
         except KeyError:
             print(
-                f"No configured commands found for device: {self.device_name}")
+                f"No configured commands found for device: {device_name}")
             available_devices = [
                 device for device in self.data['device'][0].keys()]
             available_devices = ' '.join(available_devices)

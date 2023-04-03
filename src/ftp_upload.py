@@ -2,15 +2,11 @@ import ftplib
 
 
 class FTPUpload:
-    def __init__(self, filename, server_data):
+    def __init__(self, filename, server_data, *args, **kwargs):
         self.filename = filename
         self.server_data = server_data
         self.file = None
         self.ftp_session = None
-        self.open_ftp_session()
-        self.open_ftp_file()
-        self.store_ftp_file()
-        self.close_ftp()
 
     def open_ftp_session(self):
         try:

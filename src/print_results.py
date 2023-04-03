@@ -2,17 +2,12 @@ from datetime import datetime
 import csv
 
 
-class Results:
-    def __init__(self, device_name, command_results):
+class PrintResults:
+    def __init__(self, device_name, command_results, *args, **kwargs):
         self.device_name = device_name
         self.command_results = command_results
         self.filename = None
         self.csv_file = None
-
-        self.create_csv_filename()
-        self.open_csv_file()
-        self.write_to_csv_file()
-        self.csv_file.close()
 
     def create_csv_filename(self):
         now = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')

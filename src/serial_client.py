@@ -4,17 +4,11 @@ from print_commands import PrintCommands
 
 
 class SerialClient:
-    def __init__(self, device, commands):
+    def __init__(self, device, commands, *args, **kwargs):
         self.device = device
         self.commands = commands
         self.serial_client = None
         self.command_results = dict()
-
-        self.connect_to_server_with_serial()
-        self.serial_client.write(b"sudo systemctl stop ModemManager\r")
-        self.get_modem_manufacturer_with_serial()
-        self.execute_at_commands_with_serial()
-        self.close_serial()
 
     def connect_to_server_with_serial(self):
         try:
@@ -36,6 +30,22 @@ class SerialClient:
         except:
             print(
                 f"Error when connecting with serial")
+            exit(1)
+
+    def disable_modem_manager(self):
+        try:
+            self.serial_client.write(b"sudo systemctl stop ModemManager\r")
+        except:
+            print("Failed to disable modem manager")
+            self.close_serial()
+            exit(1)
+
+    def enable_modem_manager(self):
+        try:
+            self.serial_client.write(b"sudo systemctl start ModemManager\r")
+        except:
+            print("Failed to enable modem manager")
+            self.close_serial()
             exit(1)
 
     def get_modem_manufacturer_with_serial(self):

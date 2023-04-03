@@ -2,13 +2,8 @@ import argparse
 
 
 class ArgumentParser:
-    def __init__(self):
-
+    def __init__(self, *args, **kwargs):
         self.arguments = None
-        self.parse_arguments()
-        self.adjust_case_sensitivity()
-        self.check_connectivity()
-        self.check_upload_to_ftp()
 
     def parse_arguments(self):
 
