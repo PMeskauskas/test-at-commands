@@ -50,7 +50,7 @@ def get_command_results_with_serial(args, commands):
     serial_object.execute_at_commands_with_serial()
     serial_object.enable_modem_manager()
     serial_object.close_serial()
-    return serial_client.command_results
+    return serial_object.command_results
 
 
 def get_at_command_results(args, commands):

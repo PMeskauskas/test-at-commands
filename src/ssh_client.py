@@ -43,13 +43,13 @@ class SshClient:
     def connect_to_channel(self):
         self.channel = self.ssh_client.invoke_shell()
         self.channel.settimeout(7)
-
         time.sleep(0.5)
 
     def disable_modem_manager(self):
         try:
             self.channel.send("/etc/init.d/gsmd stop\n")
-            time.sleep(2)
+            self.get_response_from_channel()
+            time.sleep(1)
         except:
             print("Failed to disable modem manager")
             self.close_ssh()
@@ -58,7 +58,7 @@ class SshClient:
     def enable_modem_manager(self):
         try:
             self.channel.send("/etc/init.d/gsmd start\n")
-            time.sleep(2)
+            time.sleep(1)
         except:
             print("Failed to enable modem manager")
             self.close_ssh()
@@ -68,6 +68,8 @@ class SshClient:
         try:
             self.channel.send(
                 "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
+            time.sleep(1)
+            self.get_response_from_channel()
         except:
             print("Failed to enable at commands")
             self.close_ssh()
@@ -83,6 +85,7 @@ class SshClient:
                     time.sleep(0.5)
 
                     self.get_response_from_channel()
+                    self.response = self.response.split()
                     if self.response[0] == '':
                         continue
                     command_response = self.response[0]
@@ -109,7 +112,7 @@ class SshClient:
                 self.channel.send(f"{self.command}\n")
                 time.sleep(0.5)
                 self.execute_extra_commands_with_ssh(i)
-                response = self.get_response_from_channel()
+                self.get_response_from_channel()
                 self.set_actual_response()
                 self.check_if_actual_response_is_equal()
                 self.total_commands = self.passed+self.failed

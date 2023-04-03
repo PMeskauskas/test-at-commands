@@ -9,6 +9,14 @@ class SerialClient:
         self.commands = commands
         self.serial_client = None
         self.command_results = dict()
+        self.failed = 0
+        self.passed = 0
+        self.response = ""
+        self.command = ""
+        self.status = ""
+        self.total_commands = 0
+        self.expected_response = ""
+        self.actual_response = ""
 
     def connect_to_server_with_serial(self):
         try:
@@ -90,9 +98,6 @@ class SerialClient:
 
         print_object = PrintCommands()
 
-        failed = 0
-        passed = 0
-        total_commands = 0
         for i in range(0, len(self.commands)):
             attempts = 0
             start_time = time.time()
@@ -105,46 +110,35 @@ class SerialClient:
                         raise TimeoutError
                     if current_time > 10:
                         raise TimeoutError
-                    command = self.commands[i]['command']
-                    expected_response = self.commands[i]['expected']
+                    self.command = self.commands[i]['command']
+                    self.expected_response = self.commands[i]['expected']
                     self.serial_client.write(f"{command}\r".encode())
                     if 'extras' in self.commands[i]:
                         self.execute_extra_commands_with_serial(
                             self.commands[i]['extras'])
 
-                    response = self.serial_client.read(
+                    self.response = self.serial_client.read(
                         20480).decode().replace('\n', ' ')
-                    if response == '':
+                    if self.response == '':
                         continue
 
-                    actual_response = self.find_actual_response(response)
-                    if actual_response == expected_response:
-                        status = 'Passed'
-                        passed += 1
-                    else:
-                        status = 'Failed'
-                        failed += 1
+                    self.set_actual_response()
+                    self.check_if_actual_response_is_equal()
+                    self.total_commands = self.passed + self.failed
 
-                    total_commands = passed+failed
-                    print_object.print_at_commands(self.device['d__device_name'], command, expected_response,
-                                                   actual_response, passed, failed, total_commands)
-                    self.command_results[i+1] = {
-                        "command": command, "expected": expected_response, 'actual': actual_response, "status": status
-                    }
+                    print_object.print_at_commands(self.device['d__device_name'], command, self.expected_response,
+                                                   self.actual_response, self.passed, self.failed, self.total_commands)
+                    self.append_command_result(i+1)
 
                 except TimeoutError:
-                    tests_dict = {"passed": passed,
-                                  "failed": failed, 'total': total_commands}
-                    self.command_results['tests'] = tests_dict
+                    self.append_test_results()
                     print_object.del_curses()
                     print("Lost connection with serial")
                     return
                 except:
                     continue
 
-        tests_dict = {"passed": passed,
-                      "failed": failed, 'total': total_commands}
-        self.command_results['tests'] = tests_dict
+        self.append_test_results()
         print_object.del_curses()
 
     def execute_extra_commands_with_serial(self, extra_commands):
@@ -157,11 +151,39 @@ class SerialClient:
                 self.serial_client.write(
                     f"{extra_commands[j]['command']}\r".encode())
 
-    def find_actual_response(self, response):
-        if 'ERROR' in response:
-            return 'ERROR'
-        if 'OK' in response:
-            return 'OK'
+    def set_actual_response(self):
+        if 'ERROR' in self.response:
+            self.actual_response = 'ERROR'
+        if 'OK' in self.response:
+            self.actual_response = 'OK'
+
+    def check_if_actual_response_is_equal(self):
+        if self.expected_response == self.actual_response:
+            self.status = 'Passed'
+            self.passed += 1
+        else:
+            self.status = 'Failed'
+            self.failed += 1
+
+    def append_command_result(self, index):
+        try:
+            self.command_results[index] = {
+                'command': self.command,
+                'expected': self.expected_response,
+                'actual': self.actual_response,
+                'status': self.status
+            }
+        except:
+            print("Failed to append result from command")
+
+    def append_test_results(self):
+        try:
+            tests_dict = {'passed': self.passed,
+                          'failed': self.failed,
+                          'total': self.total_commands}
+            self.command_results['tests'] = tests_dict
+        except:
+            print("Failed to append results from command")
 
     def close_serial(self):
         self.serial_client.close()
