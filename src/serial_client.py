@@ -1,9 +1,9 @@
 import time
 import serial
-from print_commands import PrintCommands
+from command_printer import PrintCommands
 
 
-class SerialClient:
+class CommunicationClient:
     def __init__(self, device, commands, *args, **kwargs):
         self.device = device
         self.commands = commands
@@ -18,7 +18,7 @@ class SerialClient:
         self.expected_response = ""
         self.actual_response = ""
 
-    def connect_to_server_with_serial(self):
+    def connect_to_server(self):
         try:
 
             self.serial_client = serial.Serial(self.device['serial_port'],
@@ -42,7 +42,7 @@ class SerialClient:
 
     def disable_modem_manager(self):
         try:
-            self.serial_client.write(b"sudo systemctl stop ModemManager\r")
+            self.serial_client.write(b"systemctl stop ModemManager\r")
         except:
             print("Failed to disable modem manager")
             self.close_serial()
@@ -50,13 +50,14 @@ class SerialClient:
 
     def enable_modem_manager(self):
         try:
-            self.serial_client.write(b"sudo systemctl start ModemManager\r")
+
+            self.serial_client.write(b"systemctl start ModemManager\r")
         except:
             print("Failed to enable modem manager")
             self.close_serial()
             exit(1)
 
-    def get_modem_manufacturer_with_serial(self):
+    def get_modem_manufacturer(self):
         manufacturer_commands = ['AT+GMI', "AT+GMM"]
         results = list()
 
@@ -94,7 +95,7 @@ class SerialClient:
             'model': results[1],
         }
 
-    def execute_at_commands_with_serial(self):
+    def test_command(self):
 
         print_object = PrintCommands()
 
@@ -141,7 +142,7 @@ class SerialClient:
         self.append_test_results()
         print_object.del_curses()
 
-    def execute_extra_commands_with_serial(self, extra_commands):
+    def test_extra_commands(self, extra_commands):
         for j in range(0, len(extra_commands)):
             time.sleep(0.5)
             if extra_commands[j]['command'].isnumeric():
@@ -183,8 +184,8 @@ class SerialClient:
                           'total': self.total_commands}
             self.command_results['tests'] = tests_dict
         except:
-            print("Failed to append results from command")
+            print("Failed to append test results")
 
-    def close_serial(self):
+    def close(self):
         self.serial_client.close()
         del self.serial_client

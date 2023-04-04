@@ -1,7 +1,7 @@
 import curses
 
 
-class PrintCommands():
+class CommandPrinter():
 
     def __init__(self, *args, **kwargs):
         self.stdscr = curses.initscr()

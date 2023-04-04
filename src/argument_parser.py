@@ -34,16 +34,19 @@ class ArgumentParser:
     def check_connectivity(self):
         device_name = self.arguments['d__device_name']
         connection_type = self.arguments['connection_type']
-        if connection_type == 'ssh':
-            if 'TRM' in device_name:
-                print(
-                    f"{connection_type} connection is not possible with {device_name} device")
-                exit(1)
-        if connection_type == 'serial':
-            if 'TRM' not in device_name:
-                print(
-                    f"{connection_type} connection is not possible with {device_name} device")
-                exit(1)
+        match connection_type:
+            case 'ssh':
+                if 'TRM' in device_name:
+                    print(
+                        f"{connection_type} connection is not possible with {device_name} device")
+                    exit(1)
+            case 'serial':
+                if 'TRM' not in device_name:
+                    print(
+                        f"{connection_type} connection is not possible with {device_name} device")
+                    exit(1)
+            case _:
+                exit("Connection type must be 'serial' or 'ssh'")
 
     def check_upload_to_ftp(self):
         upload_ftp_argument = self.arguments['enable_ftp'].lower()
@@ -52,5 +55,4 @@ class ArgumentParser:
         elif upload_ftp_argument == 'false':
             self.arguments['enable_ftp'] = False
         else:
-            print("Upload to FTP argument should be true or false")
-            exit(1)
+            exit("Upload to FTP argument should be true or false")

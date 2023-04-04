@@ -1,7 +1,7 @@
 import json
 
 
-class ConfigData:
+class ConfigHandler:
     def __init__(self, config_file_name, *args, **kwargs):
         self.config_file_name = config_file_name
         self.config_file = None
@@ -90,3 +90,10 @@ class ConfigData:
             print("Missing 'expected' argument in configuration file")
             return False
         return True
+
+    def close_configuration_file(self):
+        try:
+            self.config_file.close()
+        except:
+            print(f"Failed to close configuration file")
+            exit(1)

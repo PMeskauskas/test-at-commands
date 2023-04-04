@@ -1,101 +1,104 @@
-from src.argument_parser import ArgumentParser
-from src.print_results import PrintResults
-from src.ftp_upload import FTPUpload
-from src.config_data import ConfigData
 import sys
+from src.argument_parser import ArgumentParser
+from src.config_handler import ConfigHandler
+from src.communication_handler import CommunicationHandler
+from src.csv_handler import CSVHandler
+from src.ftp_uploader import FTPUploader
+from src.test_handler import TestHandler
+from src.command_printer import CommandPrinter
+
+argument_parser = None
+config_handler = None
+communication_handler = None
+csv_handler = None
+command_printer = None
+test_handler = None
+ftp_uploader = None
 
 
-def get_arguments():
-    args = ArgumentParser()
-    args.parse_arguments()
-    args.adjust_case_sensitivity()
-    args.check_connectivity()
-    args.check_upload_to_ftp()
-    return args.arguments
+def init_modules():
+    global argument_parser, config_handler, communication_handler, test_handler, command_printer, csv_handler, ftp_uploader
+    argument_parser = ArgumentParser()
+    parse_arguments()
+    config_handler = ConfigHandler('config.json')
+    communication_handler = CommunicationHandler(
+        f"{argument_parser.arguments['connection_type']}_client", **argument_parser.arguments)
+    test_handler = TestHandler(
+        communication_handler, argument_parser.arguments['d__device_name'])
+    command_printer = CommandPrinter()
+    csv_handler = CSVHandler()
+    if argument_parser.arguments['enable_ftp']:
+        ftp_uploader = FTPUploader()
 
 
-def get_configuration_data(device_name, enable_ftp):
-    config_object = ConfigData('config.json')
-    config_object.open_configuration_file()
-    config_object.load_configuration_data()
-    config_object.get_commands_by_device_name(device_name)
-    config_object.parse_device_configuration_data()
-    if enable_ftp:
-        config_object.get_ftp_server_data()
-    config_object.config_file.close()
-    return config_object
+def parse_arguments():
+    global argument_parser
+    argument_parser.parse_arguments()
+    argument_parser.adjust_case_sensitivity()
+    argument_parser.check_connectivity()
+    argument_parser.check_upload_to_ftp()
 
 
-def get_command_results_with_ssh(args, commands):
-    ssh_client = __import__('ssh_client')
-    ssh_object = ssh_client.SshClient(args, commands)
-    ssh_object.connect_to_server_with_ssh()
-    ssh_object.connect_to_channel()
-    ssh_object.disable_modem_manager()
-    ssh_object.enable_at_commands()
-    ssh_object.get_modem_manufacturer_with_ssh()
-    ssh_object.execute_at_commands_with_ssh()
-    ssh_object.enable_modem_manager()
-    ssh_object.close_ssh()
-    return ssh_object.command_results
+def get_configuration_data():
+    config_handler.open_configuration_file()
+    config_handler.load_configuration_data()
+    config_handler.get_commands_by_device_name(
+        argument_parser.arguments['d__device_name'])
+    config_handler.parse_device_configuration_data()
+    if argument_parser.arguments['enable_ftp']:
+        config_handler.get_ftp_server_data()
+    config_handler.close_configuration_file()
 
 
-def get_command_results_with_serial(args, commands):
-    serial_client = __import__('serial_client')
-    serial_object = serial_client.SerialClient(
-        args, commands)
-    serial_object.connect_to_server_with_serial()
-    serial_object.disable_modem_manager()
-    serial_object.get_modem_manufacturer_with_serial()
-    serial_object.execute_at_commands_with_serial()
-    serial_object.enable_modem_manager()
-    serial_object.close_serial()
-    return serial_object.command_results
+def open_testing_session():
+    test_handler.communication_client.connect_to_server()
+    test_handler.communication_client.disable_modem_manager()
+    csv_handler.create_csv_filename(
+        argument_parser.arguments['d__device_name'])
+    csv_handler.open_csv_file()
 
 
-def get_at_command_results(args, commands):
-    command_results = None
-    match args['connection_type']:
-        case 'ssh':
-            command_results = get_command_results_with_ssh(args, commands)
-        case 'serial':
-            command_results = get_command_results_with_serial(args, commands)
-
-        case _:
-            print("Connection type must be 'serial' or 'ssh'")
-            exit(1)
-    return command_results
+def execute_modem_commands():
+    manufacturer_data = test_handler.get_modem_manufacturer()
+    csv_handler.write_manufacturer_data(manufacturer_data)
+    exit()
 
 
-def print_command_results_to_csv(print_result_object):
-    print_result_object.create_csv_filename()
-    print_result_object.open_csv_file()
-    print_result_object.write_to_csv_file()
-    print_result_object.csv_file.close()
+def test_commands():
+    commands = config_handler.commands
+    pass
 
 
-def upload_to_ftp_server(filename, ftp_server_data):
-    ftp_upload = FTPUpload(filename, ftp_server_data)
-    ftp_upload.open_ftp_session()
-    ftp_upload.open_ftp_file()
-    ftp_upload.store_ftp_file()
-    ftp_upload.close_ftp()
+def close_testing_session():
+    global test_handler, csv_handler
+    test_handler.communication_client.execute_at_commands()
+    test_handler.communication_client.enable_modem_manager()
+    test_handler.communication_client.close_serial()
+    csv_handler.close_csv_file()
+
+
+def print_command_results_to_csv():
+
+    csv_handler.write_to_csv_file()
+
+
+def upload_file_to_ftp_server(filename, hostname, username, password):
+    ftp_uploader.open_ftp_session(hostname, username, password)
+    ftp_uploader.open_ftp_file(filename)
+    ftp_uploader.store_ftp_file(filename)
+    ftp_uploader.close_ftp()
 
 
 def main():
     sys.path.append('src')
-    args = get_arguments()
-    device_name = args['d__device_name']
-    enable_ftp = args['d__device_name']
-
-    configuration_data = get_configuration_data(
-        device_name, enable_ftp)
-    command_results = get_at_command_results(args, configuration_data.commands)
-    print_result_object = PrintResults(device_name, command_results)
-    print_command_results_to_csv(print_result_object)
-    if enable_ftp:
-        upload_to_ftp_server(print_result_object.filename,
-                             configuration_data.ftp_server_data)
+    init_modules()
+    get_configuration_data()
+    open_testing_session()
+    execute_modem_commands()
+    test_commands()
+    close_testing_session()
+    if argument_parser.arguments['enable_ftp']:
+        upload_file_to_ftp_server(csv_handler.filename,)
 
 
 if __name__ == '__main__':
