@@ -65,7 +65,7 @@
                 {
                     "command": "AT+CREG",
                     "expected": "OK",
-                    "argument": "1"
+                    "argument": 1
                 },
                 {
                     "command": "AT+CTZU",

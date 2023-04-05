@@ -6,10 +6,12 @@ class FTPUploader:
         self.file = None
         self.ftp_session = None
 
-    def open_ftp_session(self, hostname, username, password):
+    def open_ftp_session(self, server_data):
         try:
             self.ftp_session = ftplib.FTP(
-                host=hostname, user=username, passwd=password)
+                host=server_data['hostname'],
+                user=server_data['username'],
+                passwd=server_data['password'])
 
         except:
             print('Failed to create FTP session')

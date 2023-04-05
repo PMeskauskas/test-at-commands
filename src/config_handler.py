@@ -2,7 +2,7 @@ import json
 
 
 class ConfigHandler:
-    def __init__(self, config_file_name, *args, **kwargs):
+    def __init__(self, config_file_name):
         self.config_file_name = config_file_name
         self.config_file = None
         self.data = None
@@ -46,24 +46,18 @@ class ConfigHandler:
 
     def check_if_ftp_server_arguments_exists(self):
         if not "hostname" in self.ftp_server_data:
-            print("Missing 'hostname' argument in configuration file")
-            return False
+            exit("Missing 'hostname' argument in configuration file")
+
         if not "username" in self.ftp_server_data:
-            print("Missing 'username' argument in configuration file")
-            return False
+            exit("Missing 'username' argument in configuration file")
+
         if not "password" in self.ftp_server_data:
-            print("Missing 'password' argument in configuration file")
-            return False
-        return True
+            exit("Missing 'password' argument in configuration file")
 
     def parse_device_configuration_data(self):
 
         for i in range(0, len(self.commands)):
-            arguments_exists = self.check_if_command_arguments_exists(
-                self.commands[i])
-
-            if not arguments_exists:
-                exit(1)
+            self.check_if_command_arguments_exists(self.commands[i])
 
             arguments = self.commands[i]['argument']
             command = self.commands[i]['command']
@@ -78,22 +72,20 @@ class ConfigHandler:
                         parsed_argument += f"\"{argument}\","
             parsed_argument = parsed_argument[:-1]
             self.commands[i]["command"] = parsed_argument
+        exit(1)
 
     def check_if_command_arguments_exists(self, command):
         if not "command" in command:
-            print("Missing 'command' argument in configuration file")
-            return False
+            exit("Missing 'command' argument in configuration file")
+
         if not "argument" in command:
-            print("Missing 'argument' argument in configuration file")
-            return False
+            exit("Missing 'argument' argument in configuration file")
+
         if not "expected" in command:
-            print("Missing 'expected' argument in configuration file")
-            return False
-        return True
+            exit("Missing 'expected' argument in configuration file")
 
     def close_configuration_file(self):
         try:
             self.config_file.close()
         except:
-            print(f"Failed to close configuration file")
-            exit(1)
+            exit(f"Failed to close configuration file")

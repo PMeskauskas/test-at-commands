@@ -25,4 +25,4 @@ class CommunicationHandler:
         return response
 
     def close_connection(self):
-        self.__client.close()
+        self.__client.close_connection()

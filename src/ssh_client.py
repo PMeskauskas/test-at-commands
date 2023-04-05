@@ -36,40 +36,27 @@ class CommunicationClient:
         time.sleep(0.5)
 
     def disable_modem_manager(self):
-        try:
-            self.send_command_to_server(
-                "/etc/init.d/gsmd stop\n")
-        except:
-            self.close_connection()
-            exit("Failed to disable gsmd module")
-        self.enable_at_commands()
+        self.send_command_to_server(
+            "/etc/init.d/gsmd stop\n")
+        self.send_command_to_server(
+            "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
 
     def enable_modem_manager(self):
-        try:
-            self.send_command_to_server(f"{chr(int(3))}\n")
-            time.sleep(2)
-            i = 0
-            while i < 3:
-                i += 1
-                self.send_command_to_server(
-                    "/etc/init.d/gsmd start\n")
-        except:
-            self.close_connection()
-            exit("Failed to enable gsmd module")
-
-    def enable_at_commands(self):
-        try:
+        self.send_command_to_server(f"{chr(int(3))}\n")
+        time.sleep(2)
+        i = 0
+        while i < 3:
+            i += 1
             self.send_command_to_server(
-                "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
-        except:
-            print("Failed to enable at commands")
-            self.close_connection()
-            exit(1)
+                "/etc/init.d/gsmd start\n")
 
     def send_command_to_server(self, command):
-        self.channel.send(command)
-        time.sleep(1)
-        return self.get_response_from_channel()
+        try:
+            self.channel.send(f"{command}\n")
+            time.sleep(1)
+            return self.get_response_from_channel()
+        except:
+            return None
 
     def get_response_from_channel(self):
         response = self.channel.recv(

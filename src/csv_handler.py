@@ -28,35 +28,35 @@ class CSVHandler:
             print("Failed to write to csv file")
             exit(1)
 
+    def write_command_title(self):
+        self.writer.writerow('')
+        self.writer.writerow(
+            ['Number', 'Test', 'Expected output', 'Actual output', 'Status'])
+
     def write_command_data(self, command_results):
         try:
-            self.writer.writerow('')
-            self.writer.writerow(
-                ['Number', 'Test', 'Expected output', 'Actual output', 'Status'])
             number = command_results['number']
             command = command_results['command']
-            expected = command_results['expected']
-            actual = command_results['actual']
+            expected = command_results['expected_response']
+            actual = command_results['actual_response']
             status = command_results['status']
             row = [number, command, expected, actual, status]
             self.writer.writerow(row)
 
         except:
-            print("Failed to write to csv file")
-            exit(1)
+            exit("Failed to write command data to csv file")
 
     def write_test_results(self, test_data):
         try:
-            total_tests = test_data['tests']['total']
-            passed_tests = test_data['tests']['passed']
-            failed_tests = test_data['tests']['failed']
+            total_tests = test_data['total_commands']
+            passed_tests = test_data['passed']
+            failed_tests = test_data['failed']
             self.writer.writerow('')
             self.writer.writerow(['Passed tests', passed_tests])
             self.writer.writerow(['Failed tests', failed_tests])
             self.writer.writerow(['Total tests', total_tests])
         except:
-            print("Failed to write to csv file")
-            exit(1)
+            exit("Failed to write tests results to csv file")
 
     def close_csv_file(self):
         self.csv_file.close()
