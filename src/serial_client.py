@@ -33,18 +33,16 @@ class CommunicationClient:
             subprocess.run(b"systemctl stop ModemManager",
                            shell=True, check=True)
         except:
-            print("Failed to disable modem manager (Check permissions)")
             self.close_connection()
-            exit(1)
+            exit("Failed to disable modem manager (Check permissions)")
 
     def enable_modem_manager(self):
         try:
             subprocess.run(b"systemctl start ModemManager",
                            shell=True, check=True)
         except:
-            print("Failed to enable modem manager (Check permissions)")
             self.close_connection()
-            exit(1)
+            exit("Failed to enable modem manager (Check permissions)")
 
     def send_command_to_server(self, command):
         response = ''

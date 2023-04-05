@@ -13,15 +13,13 @@ class ConfigHandler:
         try:
             self.config_file = open(self.config_file_name, 'r')
         except FileNotFoundError:
-            print(f"Configuration file '{self.config_file_name}' not found")
-            exit(1)
+            exit(f"Configuration file '{self.config_file_name}' not found")
 
     def load_configuration_data(self):
         try:
             self.data = json.load(self.config_file)
         except json.JSONDecodeError:
-            print('Failed to load JSON configuration data')
-            exit(1)
+            exit('Failed to load JSON configuration data')
 
     def get_commands_by_device_name(self, device_name):
         try:
@@ -32,17 +30,15 @@ class ConfigHandler:
             available_devices = [
                 device for device in self.data['device'][0].keys()]
             available_devices = ' '.join(available_devices)
-            print(f"Available device configurations: {available_devices}")
-            exit(1)
+            exit(f"Available device configurations: {available_devices}")
 
     def get_ftp_server_data(self):
         try:
             self.ftp_server_data = self.data['ftp_server']
             self.check_if_ftp_server_arguments_exists()
         except KeyError:
-            print(
+            exit(
                 f"No FTP server configuration data found")
-            exit(1)
 
     def check_if_ftp_server_arguments_exists(self):
         if not "hostname" in self.ftp_server_data:
@@ -61,8 +57,12 @@ class ConfigHandler:
 
             arguments = self.commands[i]['argument']
             command = self.commands[i]['command']
-            arguments = arguments.split(',')
             parsed_argument = f"{command}="
+            if isinstance(arguments, int):
+                parsed_argument += f"{arguments},"
+                continue
+            arguments = arguments.split(',')
+
             for argument in arguments:
                 argument = argument.replace('"', '')
                 if argument != "":
@@ -72,7 +72,6 @@ class ConfigHandler:
                         parsed_argument += f"\"{argument}\","
             parsed_argument = parsed_argument[:-1]
             self.commands[i]["command"] = parsed_argument
-        exit(1)
 
     def check_if_command_arguments_exists(self, command):
         if not "command" in command:

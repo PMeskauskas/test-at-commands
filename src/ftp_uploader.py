@@ -14,26 +14,23 @@ class FTPUploader:
                 passwd=server_data['password'])
 
         except:
-            print('Failed to create FTP session')
-            exit(1)
+            exit('Failed to create FTP session')
 
     def open_ftp_file(self, filename):
         try:
             self.file = open(f'results/{filename}', 'rb')
 
         except FileNotFoundError:
-            print("File not found for FTP transfer")
             self.ftp_session.quit()
-            exit(1)
+            exit("File not found for FTP transfer")
 
     def store_ftp_file(self, filename):
         try:
             store_command = f"STOR {filename}"
             self.ftp_session.storbinary(store_command, self.file)
         except:
-            print("Could not transfer file to FTP server")
             self.close_ftp(self)
-            exit(1)
+            exit("Could not transfer file to FTP server")
 
     def close_ftp(self):
         self.file.close()

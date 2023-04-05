@@ -37,14 +37,12 @@ class ArgumentParser:
         match connection_type:
             case 'ssh':
                 if 'TRM' in device_name:
-                    print(
+                    exit(
                         f"{connection_type} connection is not possible with {device_name} device")
-                    exit(1)
             case 'serial':
                 if 'TRM' not in device_name:
-                    print(
+                    exit(
                         f"{connection_type} connection is not possible with {device_name} device")
-                    exit(1)
             case _:
                 exit("Connection type must be 'serial' or 'ssh'")
 

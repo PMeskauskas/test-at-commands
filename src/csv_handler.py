@@ -25,8 +25,8 @@ class CSVHandler:
             self.writer.writerow(['Manufacturer', 'Model'])
             self.writer.writerow([manufacturer, model])
         except:
-            print("Failed to write to csv file")
-            exit(1)
+            self.close_csv_file()
+            exit("Failed to write manufacturer data to csv file")
 
     def write_command_title(self):
         self.writer.writerow('')
@@ -42,8 +42,8 @@ class CSVHandler:
             status = command_results['status']
             row = [number, command, expected, actual, status]
             self.writer.writerow(row)
-
         except:
+            self.close_csv_file()
             exit("Failed to write command data to csv file")
 
     def write_test_results(self, test_data):
@@ -56,6 +56,7 @@ class CSVHandler:
             self.writer.writerow(['Failed tests', failed_tests])
             self.writer.writerow(['Total tests', total_tests])
         except:
+            self.close_csv_file()
             exit("Failed to write tests results to csv file")
 
     def close_csv_file(self):

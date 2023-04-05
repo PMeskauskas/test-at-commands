@@ -85,7 +85,7 @@
                 {
                     "command": "AT+CMGS",
                     "expected": "OK",
-                    "argument": "+3706000000",
+                    "argument": "+37060000000",
                     "extras": [
                         {
                             "command": "Sample text"

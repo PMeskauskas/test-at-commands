@@ -101,7 +101,6 @@ class TestHandler:
                         f"{extra_commands[j]['command']}")
                     if self.response is None:
                         return
-                time.sleep(0.5)
 
     def set_actual_response(self):
         if 'ERROR' in self.response:
