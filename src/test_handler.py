@@ -30,7 +30,6 @@ class TestHandler:
                         f"{manufacturer_commands[i]}")
                     if self.response is None:
                         raise TimeoutError
-                    print(self.response)
                     self.response = self.response.split()
                     command_response = self.response[0]
                     if command_response == manufacturer_commands[i]:
