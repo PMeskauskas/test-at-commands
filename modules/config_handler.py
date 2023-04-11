@@ -57,21 +57,29 @@ class ConfigHandler:
 
             arguments = self.commands[i]['argument']
             command = self.commands[i]['command']
-            parsed_argument = f"{command}="
+            command = f"{command}="
+            parsed_command = command
             if isinstance(arguments, int):
-                parsed_argument += f"{arguments},"
+                parsed_command = command
+                parsed_command += f"{arguments}"
+                self.commands[i]["command"] = parsed_command
                 continue
             arguments = arguments.split(',')
+            parsed_command = self.parse_configuration_command(
+                arguments, command)
+            self.commands[i]["command"] = parsed_command
 
-            for argument in arguments:
-                argument = argument.replace('"', '')
-                if argument != "":
-                    if argument.isnumeric() or argument == "?":
-                        parsed_argument += f"{argument},"
-                    else:
-                        parsed_argument += f"\"{argument}\","
-            parsed_argument = parsed_argument[:-1]
-            self.commands[i]["command"] = parsed_argument
+    def parse_configuration_command(self, arguments, command):
+        parsed_command = command
+        for argument in arguments:
+            argument = argument.replace('"', '')
+            if argument != "":
+                if argument.isnumeric() or argument == "?":
+                    parsed_command += f"{argument},"
+                else:
+                    parsed_command += f"\"{argument}\","
+        parsed_command = parsed_command[:-1]
+        return parsed_command
 
     def check_if_command_arguments_exists(self, command):
         if not "command" in command:

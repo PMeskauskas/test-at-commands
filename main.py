@@ -1,9 +1,9 @@
 import sys
-from src.argument_parser import ArgumentParser
-from src.config_handler import ConfigHandler
-from src.communication_handler import CommunicationHandler
-from src.ftp_uploader import FTPUploader
-from src.test_handler import TestHandler
+from modules.argument_parser import ArgumentParser
+from modules.config_handler import ConfigHandler
+from modules.communication_handler import CommunicationHandler
+from modules.ftp_uploader import FTPUploader
+from modules.test_handler import TestHandler
 
 argument_parser = None
 config_handler = None
@@ -45,10 +45,13 @@ def get_configuration_data():
 
 
 def test_commands():
-    test_handler.open_testing_session()
-    test_handler.test_modem_manufacturer()
-    test_handler.test_commands()
-    test_handler.close_testing_session()
+    try:
+        test_handler.open_testing_session()
+        test_handler.test_modem_manufacturer()
+        test_handler.test_commands()
+        test_handler.close_testing_session()
+    except TimeoutError:
+        pass
 
 
 def upload_file_to_ftp_server():
@@ -59,7 +62,7 @@ def upload_file_to_ftp_server():
 
 
 def main():
-    sys.path.append('src')
+    sys.path.append('modules')
     init_modules()
     get_configuration_data()
     test_commands()

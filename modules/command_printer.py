@@ -24,11 +24,11 @@ class CommandPrinter():
         self.stdscr.addstr(
             3, 0, f"Actual response: {command_results['actual_response']}")
         self.stdscr.addstr(
-            4, 0, f"PASSED TESTS: {command_results['passed']}", curses.color_pair(1))
+            4, 0, f"PASSED TESTS: {command_results['passed_command_count']}", curses.color_pair(1))
         self.stdscr.addstr(
-            5, 0, f"FAILED TESTS: {command_results['failed']}", curses.color_pair(2))
+            5, 0, f"FAILED TESTS: {command_results['failed_command_count']}", curses.color_pair(2))
         self.stdscr.addstr(
-            6, 0, f"TOTAL TESTS: {command_results['total_commands']}")
+            6, 0, f"TOTAL TESTS: {command_results['total_command_count']}")
         self.stdscr.refresh()
         self.stdscr.erase()
 
@@ -36,3 +36,16 @@ class CommandPrinter():
         curses.echo()
         curses.nocbreak()
         curses.endwin()
+
+    def print_at_command_to_terminal(self, command_results):
+        print(
+            f"Tested product: {command_results['device_name']}, {command_results['model']}")
+        print(f"Last command tested: {command_results['command']}")
+        print(f"Expected response: {command_results['expected_response']}")
+
+        print(f"Actual response: {command_results['actual_response']}")
+        print(
+            f"PASSED TESTS: {command_results['passed_command_count']}")
+        print(
+            f"FAILED TESTS: {command_results['failed_command_count']}")
+        print(f"TOTAL TESTS: {command_results['total_command_count']}")

@@ -19,7 +19,7 @@ class CommunicationClient:
             self.ssh_client.connect(hostname=self.addr,
                                     username=self.username,
                                     password=self.password,
-                                    timeout=10)
+                                    timeout=5)
             self.connect_to_channel()
 
         except paramiko.AuthenticationException:
@@ -36,27 +36,29 @@ class CommunicationClient:
         time.sleep(0.5)
 
     def disable_modem_manager(self):
-        self.send_command_to_server(
+        self.execute_at_command(
             "/etc/init.d/gsmd stop\n")
-        self.send_command_to_server(
+        self.execute_at_command(
             "socat /dev/tty,raw,echo=0,escape=0x03 /dev/ttyUSB3,raw,setsid,sane,echo=0,nonblock ; stty sane\n")
 
     def enable_modem_manager(self):
-        self.send_command_to_server(f"{chr(int(3))}\n")
+
+        self.execute_at_command(f"{chr(int(3))}\n")
         time.sleep(2)
         i = 0
         while i < 3:
             i += 1
-            self.send_command_to_server(
+            self.execute_at_command(
                 "/etc/init.d/gsmd start\n")
 
-    def send_command_to_server(self, command):
+    def execute_at_command(self, command):
         try:
             self.channel.send(f"{command}\n")
             time.sleep(1)
             return self.get_response_from_channel()
-        except:
-            return None
+
+        except socket.timeout:
+            raise TimeoutError
 
     def get_response_from_channel(self):
         response = self.channel.recv(

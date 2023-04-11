@@ -31,7 +31,7 @@ class CSVHandler:
     def write_command_title(self):
         self.writer.writerow('')
         self.writer.writerow(
-            ['Number', 'Test', 'Expected output', 'Actual output', 'Status'])
+            ['Number', 'Test', 'Expected output', 'Actual output', 'Response status'])
 
     def write_command_data(self, command_results):
         try:
@@ -39,8 +39,8 @@ class CSVHandler:
             command = command_results['command']
             expected = command_results['expected_response']
             actual = command_results['actual_response']
-            status = command_results['status']
-            row = [number, command, expected, actual, status]
+            response_status = command_results['response_status']
+            row = [number, command, expected, actual, response_status]
             self.writer.writerow(row)
         except:
             self.close_csv_file()
@@ -48,9 +48,9 @@ class CSVHandler:
 
     def write_test_results(self, test_data):
         try:
-            total_tests = test_data['total_commands']
-            passed_tests = test_data['passed']
-            failed_tests = test_data['failed']
+            total_tests = test_data['total_command_count']
+            passed_tests = test_data['passed_command_count']
+            failed_tests = test_data['failed_command_count']
             self.writer.writerow('')
             self.writer.writerow(['Passed tests', passed_tests])
             self.writer.writerow(['Failed tests', failed_tests])

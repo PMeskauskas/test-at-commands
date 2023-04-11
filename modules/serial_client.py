@@ -44,12 +44,12 @@ class CommunicationClient:
             self.close_connection()
             exit("Failed to enable modem manager (Check permissions)")
 
-    def send_command_to_server(self, command):
-        response = ''
+    def execute_at_command(self, command):
         attempts = 0
         start_time = time.time()
         while True:
             try:
+                response = ''
                 attempts+1
                 current_time = time.time() - start_time
                 attempts += 1
@@ -60,12 +60,11 @@ class CommunicationClient:
 
                 response = self.serial_client.read(
                     20480).decode().replace('\n', ' ')
-
                 if response == '':
-                    continue
+                    return None
                 return response
             except TimeoutError:
-                return None
+                raise TimeoutError
             except:
                 continue
 
