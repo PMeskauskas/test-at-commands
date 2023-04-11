@@ -78,6 +78,11 @@
                     "argument": ""
                 },
                 {
+                    "command": "AT+CMGF",
+                    "expected": "OK",
+                    "argument": "1"
+                },
+                {
                     "command": "AT+CMGS",
                     "expected": "OK",
                     "argument": "+3706",
@@ -198,9 +203,27 @@
             ],
             "RUT955": [
                 {
-                    "command": "AT+CSQ",
+                    "command": "AT+CTZU",
+                    "expected": "OK",
+                    "argument": "1"
+                },
+                {
+                    "command": "AT+QNWINFO",
                     "expected": "OK",
                     "argument": ""
+                },
+                {
+                    "command": "AT+CMGS",
+                    "expected": "OK",
+                    "argument": "+3706",
+                    "extras": [
+                        {
+                            "command": "Sample text"
+                        },
+                        {
+                            "command": "26"
+                        }
+                    ]
                 }
             ]
         }
