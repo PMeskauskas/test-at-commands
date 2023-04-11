@@ -42,7 +42,7 @@ Configuration file command argument description:
 * "command" argument is used to specify the running AT command without the argument, For example, AT+COPS.
 * "argument" argument is used to specify the commands' arguments, for example, "1". You can also specify multiple arguments by seperating them with a comma, for example, if you input the command AT+COPS with arguments "help,1", the program will parse the command and the result will be "AT+COPS="help",1".
 * "expected" argument is used to specify what the expected result should be, the program returns ERROR if the command failed and OK if the program succeded, so the expected argument should be "OK" or "ERROR".
-* "extras" argument is used to specify extra inputs or commands to send to the modem. In this example we are sending "Sample text" and a SIGTSTP signal to the modem.
+* "extras" argument is used to specify extra inputs or commands to send to the modem after executing the main AT command. In this example we are sending "Sample text" and a SIGTSTP signal to the modem after sending AT+CMGS command.
 
 ![image](https://user-images.githubusercontent.com/88384951/226626282-28dc7688-afd7-46c3-a35d-6714b1b77cf7.png)
 
