@@ -1,4 +1,7 @@
 import argparse
+import re
+
+regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
 
 class ArgumentParser:
@@ -23,6 +26,8 @@ class ArgumentParser:
                             help="Server password", const=1, nargs="?", default="Admin123")
         parser.add_argument("--enable_ftp", action="store",
                             help="Option to upload to FTP server (True,False)", const=1, nargs="?", default="false")
+        parser.add_argument("-e", "--email", action="store",
+                            help="Option to send email", const=1, nargs="?", default="paulius.meskauskas@teltonika.lt")
 
         self.arguments = parser.parse_args()
         self.arguments = vars(self.arguments)
@@ -54,3 +59,9 @@ class ArgumentParser:
             self.arguments['enable_ftp'] = False
         else:
             exit("Upload to FTP argument should be true or false")
+
+    def verify_email(self):
+        email = self.arguments['email']
+        regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        if not re.search(regex, email):
+            exit("Email is not valid")

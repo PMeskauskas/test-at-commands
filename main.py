@@ -20,7 +20,7 @@ def init_modules():
     communication_handler = CommunicationHandler(
         f"{argument_parser.arguments['connection_type']}_client", **argument_parser.arguments)
     test_handler = TestHandler(
-        communication_handler, argument_parser.arguments['d__device_name'], config_handler.commands)
+        communication_handler, argument_parser.arguments['email'], argument_parser.arguments['d__device_name'],  config_handler.commands)
 
     if argument_parser.arguments['enable_ftp']:
         ftp_uploader = FTPUploader()

@@ -1,13 +1,16 @@
 import time
 from modules.command_printer import CommandPrinter
 from modules.csv_handler import CSVHandler
+from modules.mail_sender import MailSender
 
 
 class TestHandler:
-    def __init__(self, communication_client, device_name, commands):
+    def __init__(self, communication_client, email, device_name, commands):
         self.communication_client = communication_client
         self.csv_handler = CSVHandler()
+        self.mail_sender = MailSender()
         self.device_name = device_name
+        self.email = email
         self.command_results = dict()
         self.commands = commands
         self.model = None
@@ -36,6 +39,9 @@ class TestHandler:
             except TimeoutError:
                 self.communication_client.close_connection()
                 self.csv_handler.close_csv_file()
+                self.mail_sender.form_message_failed(
+                    destination=self.email, device_name=self.device_name)
+                self.mail_sender.send_mail()
                 exit("Lost connection to server")
         manufacturer_results = {
             "manufacturer": results[0],
@@ -82,11 +88,17 @@ class TestHandler:
                 self.csv_handler.write_test_results(self.command_results)
                 command_printer.print_at_command_to_terminal(
                     self.command_results)
+                self.mail_sender.form_message_failed(
+                    destination=self.email, device_name=self.device_name)
+                self.mail_sender.send_mail()
                 print("Lost connection to server")
                 raise TimeoutError
         command_printer.del_curses()
         command_printer.print_at_command_to_terminal(self.command_results)
         self.csv_handler.write_test_results(self.command_results)
+        self.mail_sender.form_message_success(
+            destination=self.email, device_name=self.device_name)
+        self.mail_sender.send_mail()
 
     def execute_extra_commands(self, index):
         if 'extras' in self.commands[index]:

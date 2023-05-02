@@ -1,0 +1,26 @@
+Manufacturer,Model
+Quectel,EG06
+
+Number,Test,Expected output,Actual output,Response status
+1,AT+CPIN=1234,ERROR,ERROR,Passed
+2,"AT+CPWD=""SC"",1234,1234",OK,ERROR,Failed
+3,AT+CIMI,OK,OK,Passed
+4,AT+GMR,OK,OK,Passed
+5,AT+CGMM,OK,OK,Passed
+6,AT+CGMR,OK,OK,Passed
+7,AT+GSN,OK,OK,Passed
+8,AT+CGSN,OK,OK,Passed
+9,AT+CPAS,OK,OK,Passed
+10,AT+CEER,OK,OK,Passed
+11,AT+COPS?,OK,OK,Passed
+12,AT+CREG=1,OK,OK,Passed
+13,AT+CTZU=1,OK,OK,Passed
+14,AT+QNWINFO,OK,OK,Passed
+15,AT+CMGF=1,OK,OK,Passed
+16,"AT+CMGS=""+3706""",OK,ERROR,Failed
+17,AT+CSQ,OK,OK,Passed
+18,AT+COPN,OK,OK,Passed
+
+Passed tests,16
+Failed tests,2
+Total tests,18
